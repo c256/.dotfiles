@@ -1,0 +1,125 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@; @;
+
+
+1.1
+date	2009.02.04.20.57.28;	author chadp;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@;;; zwgc-window.el -- part of the zwgc major mode for emacs.  This
+;;; file contains hacked definitions of window functions to preserve
+;;; the *zwgc* window.  Written by Kkkken Duda <kkkken@@mit.edu>
+;;;
+;;; Copyright 1991 by Barr3y Jaspan <bjaspan@@mit.edu>e
+;;; This file is covered by the GNU General Public License.
+;;;
+;;; $Id: zwgc-window.el,v 1.4 91/09/01 13:50:39 bjaspan Exp $
+;;; $Source: /afs/athena.mit.edu/user/b/bjaspan/elisp/RCS/zwgc-window.el,v $
+
+(defvar zwgc-pop-to-buffer-builtin nil
+  "Symbol whose variable cell is t if the function cell has been set
+to 'pop-to-buffer.  Used to prevent the function cell being set more
+than once.")
+
+(defun zwgc-pop-to-buffer (buffer &optional other)
+  (interactive (list (get-buffer-create "*test*") nil))
+  (let ((w (get-buffer-window zwgc-bufnam)))
+    (if w (zwgc-hide))
+    (zwgc-pop-to-buffer-builtin buffer other)
+    (if w (zwgc-show))
+    (get-buffer buffer)
+    ))
+
+(defun zwgc-one-window-p (&optional arg)
+  "Returns non-nil if there is only one window.  Optional arg NOMINI
+non-nil means don't count the minibuffer even if it is active.  The
+*zwgc* buffer is never counted."
+  (let* ((select (selected-window))
+	 (next (next-window select (if arg 'arg)))
+	 (nnext (next-window next (if arg 'arg)))
+	 (zwin (get-buffer-window zwgc-bufnam))
+	 )
+    (eq select (if (eq next zwin) nnext next))
+    ))
+
+(defun zwgc-maybe-resize-window ()
+  "Like zwgc-resize-window, but will selected the *zwgc* window
+if it's visible, and will do nothing if it's not." 
+  (let ((w (get-buffer-window zwgc-bufnam))
+	(ow (selected-window)))
+    (if w
+	(progn
+	  (select-window w)
+	  (zwgc-resize-window)
+	  (select-window ow)))))
+
+(defun zwgc-hacked-split-window (&rest args)
+  "Replacement for split-window that tries hard
+to keep the *zwgc* buffer displayed and fixed in size."
+  (interactive)
+  (apply 'split-window args)
+  (zwgc-maybe-resize-window))
+
+(defun zwgc-hacked-delete-window (&rest args)
+  "Replacement for delete-window that tries hard
+to keep the *zwgc* buffer displayed and fixed in size."
+  (interactive)
+  (apply 'delete-window args)
+  (zwgc-maybe-resize-window))
+
+(defun zwgc-hacked-delete-other-windows (&rest args)
+  "Replacement for delete-other-windows that tries hard
+to keep the *zwgc* buffer displayed and fixed in size."
+  (interactive)
+  (let ((sw (selected-window))
+	(zw (get-buffer-window zwgc-bufnam))
+	(nw (next-window (selected-window) 1))
+	w)
+    (while (not (eq nw sw))
+      (setq w nw)
+      (setq nw (next-window nw 1))
+      (or (eq w zw)
+	  (eq w sw)
+	  (delete-window w))))
+  (zwgc-maybe-resize-window))
+
+(defun zwgc-window-startup ()
+  (setq temp-buffer-show-hook
+	(function
+	 (lambda (buffer)
+	   (let ((w (get-buffer-window zwgc-bufnam))
+		 temp-buffer-show-hook
+		 (string (save-excursion
+			   (set-buffer buffer)
+			   (buffer-string)))
+		 )
+	     (if w (zwgc-hide))
+	     (with-output-to-temp-buffer (buffer-name buffer)
+	       (princ string)
+	       )
+	     (if w (zwgc-show))
+	     ))))
+
+  (if zwgc-pop-to-buffer-builtin
+      nil
+    (fset 'zwgc-pop-to-buffer-builtin (symbol-function 'pop-to-buffer))
+    (setq zwgc-pop-to-buffer-builtin t))
+
+  (fmakunbound 'zwgc-window-startup)
+  )
+(zwgc-window-startup)
+@

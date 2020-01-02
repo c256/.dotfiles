@@ -1,0 +1,95 @@
+# My aliases : yandros@mit.edu
+
+alias dq 'fs lq /afs/sipb.mit.edu/user/yandros \\
+      	  /afs/sipb.mit.edu/user/yandros/.Private \\
+      	  | sendme'
+alias zsendme   "alias sendme 'zwrite -n -c sendme -i yandros yandros'"
+alias catsendme "alias sendme 'cat'"
+alias infscreen "setenv SCREENDIR ~y/screens/;/usr/local/bin/screen"
+alias tslep "mvknull && source ~/.lockers && source ~/.environment && source ~/.path"
+alias mqy  'echo "connect\\
+	    auth\\
+	    query \!*\\
+	    quit" | ~moira/bin/mrtest |& sed "s/moira:  //g"'
+alias retr 'pop -request c -request "retr \!:1" -request quit'
+alias dele 'pop -request c -request "dele \!:1" -request quit'
+alias yinit "exec xinit >& $HOME/.xinit-output"
+alias kat 'cat -e -v'
+alias traceon  'setenv LD_TRACE_LOADED_OBJECTS 1'
+alias traceoff 'unsetenv LD_TRACE_LOADED_OBJECTS'
+alias open 'emacsclient -n'
+
+# from Eric
+alias weboed    'lynx http://bion.mit.edu:8000/patbin/oed-kwic\?query=`echo \!:* | sed -e '"'"'s/ /%20/g'"'"'`\&type-Lookup\&size=1-100'
+
+alias fetchmail 'echo "no, thank you."'
+
+alias cp 'cp -i'
+alias mv 'mv -i'
+alias j 'jobs -l'
+alias cd 'pushd'
+alias bd 'popd'
+alias l 'ls -lF'
+if ($hosttype == "rsaix") then
+  alias ll 'ls -laF'
+else
+  if ($hosttype == "iris4d") then
+    alias ll 'ls -laF'
+  else
+  alias ll 'ls -laFg'
+  endif
+endif
+alias clean 'rm -i ./*~ ./.*~'
+alias hc hide_console
+alias lastlog 'vos exa user.\!* | grep "Last Update"'
+
+
+#
+# Kerberos ticket handling
+#
+alias TKT     'setenv KRBTKFILE "\!*"'
+alias TKT5    'setenv KRB5CCNAME "\!*"'
+alias tkt     'printenv KRBTKFILE'
+alias tkt5    'printenv KRB5CCNAME'
+alias knull   'TKT /tmp/tkt_y; TKT5 /tmp/krb5cc_y'
+alias kroot   'TKT /tmp/tkt_yr; TKT5 /tmp/krb5cc_yr'
+alias kextra  'TKT /tmp/tkt_ye; TKT5 /tmp/krb5cc_ye'
+alias kother  'TKT /tmp/tkt_yo; TKT5 /tmp/krb5cc_yo'
+alias kfoo    'TKT /tmp/tkt_foo; TKT5 /tmp/krb5cc_foo'
+alias mvknull 'mv $KRBTKFILE /tmp/tkt_y; mv /tmp/`basename $KRB5CCNAME` /tmp/krb5cc_y; knull'
+
+#
+# Zephyr aliases
+#
+alias z 'zwrite -n'
+alias zi 'z -q -d -i'
+alias zc 'z -q -d -c'
+alias zl zlocate
+alias zn 'znol on \!* | sendme'
+alias zwm 'zi White-Magic'
+alias zsipb 'zi sipb -s "<\\!shabby>"'
+alias ztest 'zi Test -m "*meep*" ; z yandros -m "*meep*"'
+alias zhelp 'zi help '
+alias zhelp.d 'zi help.d'
+
+alias zcc 'zc Consult -s "Chad"'
+alias zbs 'zc Blood -i Souls'
+alias zzc 'zc zone-cell'
+alias ze  'zc Explorers -s "Alan"'
+alias zcl 'zc legends -s "chad/abel"'
+
+#
+# (modified) system default aliases
+#
+alias term 'set noglob; unsetenv TERMCAP; eval `tset -s -I -Q - \!*`'
+alias renew 'kinit $USER && aklog sipb ath net zone && zctl load /dev/null'
+if ($?DISPLAY) then
+  zsendme
+else
+  catsendme
+endif
+
+#
+# Private aliases
+# 
+if (-r $HOME/.Private/aliases) source $HOME/.Private/aliases

@@ -1,0 +1,3 @@
+#!/bin/sh -
+
+Mail -s askme oracle@cs.indiana.edu < /dev/null

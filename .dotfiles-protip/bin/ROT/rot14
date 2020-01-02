@@ -1,0 +1,3 @@
+#!/bin/sh -
+
+tr '[A-Za-z]' '[O-ZA-No-za-n]'

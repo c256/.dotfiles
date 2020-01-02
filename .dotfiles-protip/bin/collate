@@ -1,0 +1,104 @@
+#!/usr/bin/perl
+# Collate two record-based text files
+use Getopt::Std;
+use Algorithm::Diff qw(traverse_sequences);
+use Array::FileReader;
+my %opts;
+getopt("s", \%opts);
+if ($opts{s}) {
+    my $set = $opts{s};
+    $set =~ s/\\(.)/"\"\\$1\""/eeg;
+    $/=$set;
+}
+my $first = shift;
+usage() unless $first;
+my $second = shift || '-';
+tie @f1, Array::FileReader, $first;
+tie @f2, Array::FileReader, $second;
+$/="\n";
+my @out;
+my @blame;
+traverse_sequences(\@f1, \@f2, 
+		   {
+		    MATCH => sub { 
+		      push @blame, "M";
+		      push @out, $_[0]<$_[1]?$f1[$_[0]]:$f2[$_[1]] 
+		    },
+		    DISCARD_A => sub { 
+		      push @blame, "A";
+		      push @out, $f1[$_[0]];},
+		    DISCARD_B => sub { 
+		      if (index($f2[$_[1]], $f1[$_[0]])>-1 
+			  and $blame[-1] eq "A") {
+			pop @blame; pop @out;
+		      }
+		      push @blame, "B";
+		      push @out, $f2[$_[1]];}
+		   });
+print @out;
+sub usage {
+    die "$0 [-s 'separator'] file1 [file2]\n";
+}
+
+=head1 NAME
+
+collate - Collate two record-based text files
+
+=head1 SYNOPSYS
+
+  collate file1 file2
+  ssh remotehost -c "cat sigfile" | coll -s '\n%\n' sigfile > sigfile.merged
+
+=head1 DESCRIPTION
+
+F<collate> works a little like F<diff> except that it tracks additions
+between files, not changes: it tries to make the largest file possible
+based on the input. For example, it will turn these two files
+
+ file1:
+     1
+     2
+     3
+     4
+
+ file2:
+     1
+     1a
+     2
+     3
+     3a
+
+into:
+
+     1
+     1a
+     2
+     3
+     3a
+     4
+
+This is useful for merging two record files which have been updated 
+separately.
+
+=head1 ARGUMENTS
+
+Two file names; if one is not given, standard input will be used.
+
+=head1 OPTIONS
+
+=over
+
+=item C<-s> I<separator> 
+
+Specify the input record separator; for instance, the signature file
+example above will collect all signatures added in both the local and
+remote signature files given the standard Unix fortune cookie file
+separator newline-percent-newline.
+=back
+
+=head1 COPYRIGHT
+This software is copyright 2000, Simon Cozens, and may be distributed
+under the terms of the Artistic License or the GNU Public License at
+your choice.
+
+=cut

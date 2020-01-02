@@ -1,0 +1,62 @@
+# Tcsh Initialization File
+# <chadpbrown@gmail.com> / <y@mit.edu><
+
+set path = ($HOME/bin $path)
+
+set prompt = "%U%n@%m%u:%~\n%# "
+#split prompt
+#set prompt = "%# "
+#set rprompt = "%U%m%u:%~"
+
+set hosttype = $HOSTTYPE
+set bindir = ${hosttype}bin
+set host = `hostname`
+
+set prompt2 = ";;; "
+set prompt3 = "[%R>"
+set promptchars = ";#"
+set history = 1500
+set savehist = ($history merge)
+set ignoreeof  
+unset autologout
+set lineditmin = 4
+set fignore = (~)
+if ($host != "multics.mit.edu") then 
+	set watch = ( any any )
+endif
+set autoexpand
+set autolist
+set histlist 
+set dextract
+set pushdtohome
+set pushdsilent
+set visiblebell
+set listjobs=long
+set ignore_symlinks
+set showdots
+set matchbeep = notunique
+set listmax = 250
+set rmstar
+set wordchars = "[]~="
+unset autologout savedirs
+
+bindkey " "  magic-space
+bindkey "^s" i-search-fwd
+bindkey "^r" i-search-back
+
+# outboard environment
+if ( -f "~/.tcsh_environment") then
+	source ~/.tcsh_environment
+endif
+
+# outboard aliases
+if ( -f "~/.tcsh_aliases") then
+	source ~/.tcsh_aliases
+endif
+
+# outboard completion
+if ( -f "~/.tcsh_complete") then
+	source ~/.tcsh_complete
+endif
+
+complete setenv 'p/1/e/' 'c/*:/d/'

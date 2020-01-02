@@ -1,0 +1,83 @@
+# Tcsh 6 Initialization File
+
+## Setup paths
+setenv PYTHONPATH /usr/local/lib/python2.7/site-packages
+setenv GOPATH $HOME/Work
+
+set path = ($HOME/bin \
+			/usr/local/opt/gpg-agent/bin \
+			/usr/local/sbin /usr/local/bin \
+            /Applications/Emacs.app/Contents/MacOS/bin \
+            $GOPATH/bin \
+            /NOTUSED/Developer/usr/bin \
+            /usr/sbin /usr/bin /sbin /bin )
+
+# Colors for the prompt
+set    green="%{\033[0;32m%}"
+set   yellow="%{\033[1;33m%}"
+set     blue="%{\033[1;34m%}"
+set     cyan="%{\033[1;36m%}"
+set    white="%{\033[0;37m%}"
+set endcolor="%{\033[0m%}"
+
+set prompt = "${blue}%U%n${cyan}@%m%u:${yellow}%~\n${endcolor}%# "
+#split prompt, doesn't quite work with color
+#set prompt = "%# "
+#set rprompt = "%U%m%u:%~"
+#set rprompt = "${blue}%U%m%u:${yellow}%~${endcolor}"
+
+# Clean up after ourselves...
+unset green yellow blue cyan yellow white endcolor
+
+set autoexpand
+set autolist
+unset autologout savedirs
+set dextract
+set ellipsis
+set fignore = (~)
+set histlist
+set history = 2500
+set host = `hostname`
+set ignore_symlinks
+set ignoreeof
+set lineditmin = 4
+set listjobs=long
+set listmax = 150
+set matchbeep = notunique
+set nostat = ( /afs )
+set printexitvalue
+set prompt2 = ";;; "
+set prompt3 = "[%R>"
+set promptchars = ";#"
+set pushdsilent
+set pushdtohome
+set rmstar
+set savehist = ($history merge)
+set showdots
+set time = 20
+set visiblebell
+set watch = ( any any )
+set wordchars = "[]~="
+
+bindkey " "  magic-space
+bindkey "^s" i-search-fwd
+bindkey "^r" i-search-back
+
+# completion
+complete setenv 'p/1/e/' 'c/*:/d/'
+complete unsetenv 'p/1/e/' 'c/*:/d/'
+complete kill 'c/-/S/' 'p/*/`ps -x | awk \{print\ \$1\}`/'
+complete scp 'c;*@;`awk \{print\ \$1\} < $HOME/.ssh/known_hosts | sed -e s/,.\*\$// | uniq`;:;'
+complete ssh 'c;*@;`awk \{print\ \$1\} < $HOME/.ssh/known_hosts | sed -e s/,.\*\$// | uniq`;' 'p;*;`awk \{print\ \$1\} < $HOME/.ssh/known_hosts | sed -e s/,.\*\$// | uniq`;'
+
+setenv GZIP -9
+setenv EDITOR emacsclient
+setenv LANG en_US.UTF-8
+setenv LC_ALL en_US.UTF-8
+setenv LC_COLLATE C
+setenv CLICOLOR
+setenv HOSTNAME $host
+setenv ENSCRIPT -2hr
+setenv EMACS /Applications/Emacs.app/Contents/MacOS/Emacs
+
+source ~/.aliases                       # aliases

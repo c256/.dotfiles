@@ -1,0 +1,15 @@
+#!/bin/sh 
+
+FILE=$1;
+
+if echo $FILE | egrep .doc$ ; then
+    SUFFIX=".doc";
+elif echo $FILE | egrep .DOC$; then
+    SUFFIX=".DOC";
+else
+    echo "Bad filename $file";
+    exit 2
+fi
+
+wvHtml "$FILE" "`basename $FILE $SUFFIX`.html"
+

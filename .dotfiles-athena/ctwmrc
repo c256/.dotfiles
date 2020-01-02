@@ -1,0 +1,218 @@
+# Try out ctwm.  could be fun.
+
+MenuFont      	"-adobe-times-bold-i-normal--12-120-*-*-*-*-*-*"
+IconFont      	"-adobe-helvetica-bold-r-normal--12-120-*-*-*-*-*-*"
+IconManagerFont	"-schumacher-clean-bold-r-normal--10-*-*-*-*-*-*-*"
+ResizeFont    	"-b&h-lucidabright-medium-r-*-*-20-*-*-*-*-*-*-*"
+IconManagerFont "-adobe-helvetica-bold-r-normal--*-100-*-*-*"
+WorkSpaceFont   "-*-*-*-*-*-*-6-*-*-*-*-*-*-*"
+
+AutoRelativeResize
+# seems to DBT with zephyr
+#AutoFocusToTransients
+BorderWidth 1
+CenterFeedbackWindow
+DontPaintRootWindow
+DontMoveOff
+IconifyByUnmapping
+InterpolateMenuColors
+IgnoreLockModifier
+RestartPreviousState
+#ShowWorkSpaceManager
+#StartInMapState
+MaxWindowSize "2000x2000"
+MoveDelta 3
+NoDefaults
+NoHighlight { 
+	"xscreensaver" "fclock" "XLoad" "Virtual Desktop" "XClock" "XApm" }
+NoGrabServer
+NoIconManagers
+NoMenuShadows
+NoRaiseOnMove
+NoRaiseOnResize
+NoShowOccupyAll
+NoTitle
+MakeTitle { "Netscape" "Navigator" "Gimp" }
+OpaqueMove
+OpaqueResize
+PackNewWindows
+RandomPlacement "unmapped"
+StayUpMenus
+WarpUnmapped
+WindowRing { "NXTerm" "XTerm" "RightEmacs" "LeftEmacs"}
+WarpRingOnScreen
+#XMoveGrid 515
+#YMoveGrid 8
+XorValue 1
+Zoom 0
+
+ReallyMoveInWorkspaceManager
+
+WorkSpaceManagerGeometry        "300x30-3+3" 5
+WorkSpaces {
+    "Local"    {"SteelBlue"    "White"}
+    "Netscape" {"DeepSkyBlue"  "Black"}
+    "Ghost"    {"MidnightBlue" "White"}
+    "Extra"    {"SlateGray"    "Black"}
+    "Remote"   {"BlueViolet"   "White"}
+}
+Occupy {
+			"Netscape" 	{"Netscape"}
+#			"Zwgc"	        {"Remote"}
+}
+
+OccupyAll { "AkaBuffer" "XClock" "XApm" "XLoad" "Zwgc" "fclock" }
+
+SaveColor {
+	"black"
+	"deep sky blue"
+	"steel blue"
+	"NavajoWhite"
+	"BlueViolet"
+	"SpringGreen"
+	"PaleGoldenRod"
+	"Orange"
+	"Light Steel Blue"
+}
+
+Color
+{
+  DefaultBackground 	    "black"
+  DefaultForeground 	    "deep sky blue"
+
+  BorderTileBackground      "SteelBlue" { "xscreensaver" "Black"
+	                                   "fclock" "Black"
+	                                   "Clock" "Black"
+                                           "XLoad" "Black"
+                                           "XClock" "Black"
+                                           "XApm" "Black"
+                                           "TWM Icon Manager" "Black"
+                                           "Virtual Desktop" "Black"  }
+
+  BorderTileForeground      "SteelBlue" { "xscreensaver" "Black"
+	                                   "fclock" "Black"
+	                                   "Clock" "Black"
+                                           "XLoad" "Black"
+                                           "XClock" "Black"
+                                           "XApm" "Black"
+                                           "TWM Icon Manager" "Black"
+                                           "Virtual Desktop" "Black"  }
+  BorderColor 		    "DeepSkyBlue"  { "xscreensaver" "Black"
+	                                   "fclock" "Black"
+	                                   "Clock" "Black"
+                                           "XLoad" "Black"
+                                           "XClock" "Black"
+                                           "XApm" "Black"
+                                           "TWM Icon Manager" "Black"
+                                           "Virtual Desktop" "Black"  }
+
+  TitleBackground   	    "black"
+  TitleForeground   	    "NavajoWhite"
+  MenuBackground    	    "Black"
+  MenuForeground    	    "LightSlateGray"
+  MenuTitleBackground       "Black"
+  MenuTitleForeground       "SteelBlue"
+  IconBackground    	    "SlateGray"
+  IconBorderColor   	    "MidnightBlue"
+  IconForeground    	    "DeepSkyBlue"
+  IconManagerBackground     "Black"
+  IconManagerForeground     "SteelBlue"
+  IconManagerHighlight      "DeepSkyBlue"
+}
+
+#
+# Define some useful functions for motion-based actions.
+#
+Function "move-or-lower"        { f.forcemove f.deltastop f.lower }
+Function "move-or-raise"        { f.forcemove f.deltastop f.raise }
+Function "move-or-raiselower"   { f.forcemove f.deltastop f.raiselower }
+Function "move-or-iconify"      { f.forcemove f.deltastop f.iconify }
+Function "resize-or-raiselower" { f.resize f.deltastop f.raiselower }
+
+#
+# Set some useful bindings.  Sort of uwm-ish, sort of simple-button-ish
+#
+Button1 =	: root		: f.menu "WM"
+Button2 =       : root		: f.menu "TwmAllWindows"
+Button3 =       : root		: f.menu "#!"
+Button3 = m5    : root          : f.menu "TwmAllWindows"
+
+Button1 = m5	: window|icon	: f.function "resize-or-raiselower"
+Button2 = m5	: window|icon	: f.resize
+Button3 = m5	: window|icon	: f.forcemove
+
+Button1 =	: title		: f.function "move-or-raiselower"
+Button2 =	: title		: f.forcemove
+Button3 =	: title		: f.forcemove
+
+Button1 =	: icon		: f.iconify
+Button2 =	: icon		: f.iconify
+Button3 =	: icon		: f.function "move-or-iconify"
+
+Button1 =	: iconmgr	: f.iconify
+Button2 =	: iconmgr	: f.warpto ""
+
+"Down"  = m5	: all		: f.lower
+"Up"    = m5	: all	        : f.raise
+"Left"  = m5	: all		: f.leftworkspace
+"Right" = m5	: all	        : f.rightworkspace
+"Left"  = 	: root		: f.leftworkspace
+"Right" = 	: root	        : f.rightworkspace
+
+# Function Keys
+"F1"    =         : all             : f.warpring "next"
+"F5"    =         : all             : f.warpring "next"
+"F5"    = m5      : all             : f.warpring "next"
+"F4"    = m       : w               : f.delete
+"F4"    = m5      : w               : f.delete
+"F12"   = c|m5    : all             : f.restart
+
+"F1"    = c|m5    : all             : f.menu "WM"
+"F2"    = c|m5    : all             : f.menu "TwmAllWindows"
+"F3"    = c|m5    : all             : f.menu "#!"
+
+# windowmanager keyboard mode
+"Return" = m5     : all   	    : f.altkeymap "1"
+"Left"   = a1     : all	            : f.leftworkspace
+"Right"  = a1     : all	            : f.rightworkspace
+"Up"     = a1     : window          : f.raise
+"Down"   = a1     : window          : f.lower
+"a"      = a1     : window          : f.occupyall
+"o"      = a1     : window          : f.occupy
+"d"      = a1     : window          : f.vanish
+"w"      = a1     : window          : f.refresh
+"n"      = a1     : window          : f.warpring "next"
+"p"      = a1     : window          : f.warpring "prev"
+
+
+# Menus
+
+menu "WM"
+{
+"*WM"		f.title
+"Icon"		f.iconify
+"Size"		f.resize
+"Move"		f.forcemove
+"Down"		f.lower
+"Wipe"		f.refresh
+"Id"		f.identify
+"Add"		f.occupy
+"Drop"		f.vanish
+".rc"		f.restart
+"Del"		f.delete
+"Kill"		f.destroy
+}
+
+menu "#!"
+{
+"*#!"		f.title
+"emacs"		!"emacs -name RightEmacs &"
+"left"		!"xterm -name LeftTerm &"
+"right"		!"xterm -name RightTerm &"
+"web"	        !"netscape &"
+"load"		!"xload &"
+"clock"		!"xclock &"
+"mag"		!"xmag &"
+"xrdb"		!"xrdb /mit/yandros/.Xresources &"
+"lock"		!"xss-command --lock"
+}

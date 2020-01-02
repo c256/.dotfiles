@@ -1,0 +1,33 @@
+#!/bin/sh 
+#
+# Update and build emacs, using typical settings.
+# Does not install (bleeding edge; I want to test it first).
+# Logs output; currently blows away previous logs on each run.
+
+EMACSDIR=/usr/local/src/emacs/emacs
+
+cd $EMACSDIR
+
+date > $EMACSDIR/../.yupdate-emacs.log
+git pull | tee -a $EMACSDIR/../.yupdate-emacs.log
+if [ $? -ne 0 ]; then
+	echo "Git pull failed!"
+	say "Emacs Git pull failed!"
+	exit 17
+fi
+./autogen.sh | tee -a $EMACSDIR/../.yupdate-emacs.log
+./configure --with-ns --with-gnutls --without-dbus --without-makeinfo --without-pop | tee -a $EMACSDIR/../.yupdate-emacs.log
+if [ $? -ne 0 ]; then
+	echo "Configure failed!"
+	echo "Emacs Configure failed!"
+	exit 19
+fi
+(make -j8 bootstrap && make install) | tee -a $EMACSDIR/../.yupdate-emacs.log
+
+if [ $? -ne 0 ]; then
+	echo "Build failed!"
+	say "Emacs build failed!"
+else
+	say "Update complete"
+fi
+

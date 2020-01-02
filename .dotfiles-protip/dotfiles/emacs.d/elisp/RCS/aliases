@@ -1,0 +1,24 @@
+# Tcsh 6 aliases  ;; -*- mode: shell-script; -*-
+#
+# Short verion of (old) Project Athena dotfiles.
+
+alias cp 'cp -i'
+alias mv 'mv -i'
+alias j 'jobs -l'
+alias cd 'pushd'
+alias bd 'popd'
+#alias l 'ls -lFGhO'
+#alias ll 'ls -laFGhO'
+# Try out gnu ls
+alias l 'gls --color -lFGh'
+alias ll 'gls --color -laFGh'
+alias clean 'rm -i ./*~ ./.*~'
+alias wgrep 'egrep \!* /usr/share/dict/words'
+alias dq 'df -k $HOME'
+
+### (modified) system default aliases
+alias term 'set noglob; unsetenv TERMCAP; eval `tset -s -I -Q - \!*`'
+#alias renew 'kinit $USER && aklog sipb ath net zone && zctl load /dev/null'
+
+# Private aliases, if any
+if (-r $HOME/.Private/aliases) source $HOME/.Private/aliases

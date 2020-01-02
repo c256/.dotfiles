@@ -1,0 +1,5 @@
+#!/bin/sh
+
+cd $HOME
+
+glimpseindex -B -f -M 8 -b -t -w 1100 -z /local/home /local/doc /local/music /usr/share/doc /usr/share/man /usr/local 

@@ -1,0 +1,11 @@
+#!/bin/sh
+#
+# Mail uses an SQLite3 database, but doesn't "clean" it regularly.
+# On a large/old database, this can speed up Mail.app noticably.
+# DO NOT try this if Mail.app is running.
+
+osascript -e 'tell application "Mail" to quit'
+read -p "Make sure Mail.app has closed, then press return."
+ls -log ~/Library/Mail/V[2345]/MailData/Envelope\ Index | colrm 1 15
+sqlite3 ~/Library/Mail/V[2345]/MailData/Envelope\ Index vacuum
+ls -log ~/Library/Mail/V[2345]/MailData/Envelope\ Index | colrm 1 15

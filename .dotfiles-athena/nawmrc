@@ -1,0 +1,42 @@
+option "nocapslock";
+
+begin { setmode "normal"; }
+
+mode "normal" {
+  key "KP_7" { mouseclick "left", 5, 5; }
+  key "KP_8" { mouseclick "left", screenwidth/2, 5; }
+  key "KP_1" { mouseclick "left", 5, -5; }
+  key "KP_3" { mouseclick "left", -5, -5; }
+  key "KP_4" { warptowindow "left"; }
+  key "KP_6" { warptowindow "Emacs"; }
+  key "KP_2" { warptowindow "zephyr"; raise; }
+  key "KP_5" { warpto screenwidth/2, screenheight/2; }
+
+
+  key "meta F1" { setmode "move"; }
+  key "mod5 Up" { raise; }
+  key "mod5 Down" { lower; }
+
+#  leave "zephyr" { lower; }
+}
+
+mode "move" {
+  int lastx, lasty;
+  window mwin;
+
+  begin { mwin = currentwindow; lastx = px; lasty = py; raise; }
+  motion { move mwin, px - lastx, py - lasty; lastx = px; lasty = py; }
+  button "left" { setmode "normal"; }
+  key "Escape" { setmode "normal"; }
+}
+
+key "meta KP_7" { warp -20, -20; }
+key "meta KP_8" { warp 0, -20; }
+key "meta KP_9" { warp 20, -20; }
+key "meta KP_4" { warp -20, 0; }
+key "meta KP_5" { warp 0, 0; }
+key "meta KP_6" { warp 20, 0; }
+key "meta KP_1" { warp -20, 20; }
+key "meta KP_2" { warp 0, 20; }
+key "meta KP_3" { warp 20, 20; }
+

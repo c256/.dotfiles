@@ -1,0 +1,870 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@; @;
+
+
+1.1
+date	2009.02.04.20.57.37;	author chadp;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@;;; zwgc.el -- emacs mode for running zwgc as a sub-process; looks a
+;;; lot like rmail.  See mode help for more information.
+;;;
+;;; Copyright 1991 by Barr3y Jaspan <bjaspan@@mit.edu>
+;;; This file is covered by the GNU General Public License.
+;;;
+;;; $Id: zwgc.el,v 2.55 1996/05/17 15:50:14 bjaspan Exp bjaspan $
+;;; $Source: /afs/athena.mit.edu/user/b/j/bjaspan/elisp/RCS/zwgc.el,v $
+
+(provide 'zwgc)
+
+(defvar zwgc-version
+  "$Id: zwgc.el,v 2.55 1996/05/17 15:50:14 bjaspan Exp bjaspan $"
+  "*The RCS string identifing the precise version of zwgc mode.")
+
+(defvar zwgc-process nil)
+
+(defvar zwgc-description-file (expand-file-name "~/.zwgc.desc")
+  "*Filename passed after the \"-f\" argument to zwgc.")
+
+(defvar zwgc-prog-additional-args '()
+  "*A list containing extra arguments to pass to zwgc.")
+
+(defvar zwgc-environment (list "EMACS=t" "DISPLAY=emacs-zwgc" "TERM=emacs")
+  "*List of strings to add to the environment for zwgc.")
+
+(defvar zwgc-bufnam "*zwgc*" "The actual name of the *zwgc* buffer.")
+
+(defvar zwgc-window-min-height 4
+  "*Minimum size of the *zwgc* buffer when it is displayed.  The intention is
+to minimze repainting as the buffer size gets bounced around.")
+
+(defvar zwgc-window-max-height 10
+  "*Maximum size of the *zwgc* buffer when it is displayed.")
+
+(defvar zwgc-notices 0
+  "The total number of zephyr messages currently in the *zwgc* buffer.")
+
+(defvar zwgc-current-notice 1
+  "The number of the notice currently displayed in the *zwgc* buffer.")
+
+(defvar zwgc-prog "/usr/athena/bin/zwgc"
+  "*Program to run as the zwgc process. Should set it for the machine type.")
+
+(defvar zwgc-zctl-prog "/usr/athena/bin/zctl"
+  "*Program to run as zctl, used by zwgc-zctl-cmd.")
+
+(defvar zwgc-zpunt-prog "/afs/sipb.mit.edu/project/sipb/@@sys/zpunt"
+  "*Program used by zwgc-zpunt.")
+
+(defvar zwgc-zunpunt-prog "/afs/sipb.mit.edu/project/sipb/@@sys/zunpunt"
+  "*Program used by zwgc-zunpunt.")
+
+(defvar zwgc-auto-popup-window t
+  "*Controls whether the *zwgc* window is automatically popped up when
+a new message arrives.")
+
+(defvar zwgc-warp-to-new nil
+  "*Toggles whether new messages are immediately displayed.")
+
+(defvar zwgc-bury-buffer t
+  "*Controls whether the *zwgc* buffer is buried when the last notice
+is deleted.")
+
+(defvar zwgc-jump-on-new nil
+  "*If non-nil, change the selected window when a new notice arrives if
+the *zwgc* window is selected.")
+
+(defvar zwgc-buffer-stack nil
+  "Internal stack used to jump in and out of the *zwgc* buffer.")
+
+(defvar zwgc-notifications-terminator "\n"
+  "*String used by zwgc mode to identify the end of a notice.
+Necessary for proper functioning of zwgc-got-notice-hook and
+zwgc-notice-regexp-alist.")
+
+(defvar zwgc-mode-map nil "*Keymap used by the zwgc major mode.  Binding a
+key to this variable sets that key as a prefix for zwgc-mode functions
+from outside the *zwgc* buffer.")
+
+(defvar zwgc-notice-regexp-alist nil
+  "*List of (REGEXP . function) pairs that are matched against each
+notice as it is received.  If REGEXP matches a new notice, the
+corresponding function is called with a single argument,
+(match-data).")
+
+(defvar zwgc-reply-cell nil "\\<zwgc-mode-map>
+*Cons cell consisting of (REGEXP . FUNCTION).  REGEXP is matched
+against the current notice when \\[zwgc-reply] (zwgc-reply) is
+executed and the match data is passed as the only argument to
+FUNCTION.")
+
+(defvar zwgc-summary-regexp nil
+  "*Regular expression used by zwgc-summary to extract information for
+the *zwgc-summary* buffer.")
+
+(defvar zwgc-current-data nil
+  "Internal string used to build up each notice until the terminator
+is received.")
+
+(defvar zwgc-load-dir "/afs/athena.mit.edu/user/b/j/bjaspan/elisp"
+  "*Path where emacs zwgc and related files live.")
+
+(defvar zwgc-summary-hook nil
+  "*Function called to produce a summary string for a zwgc notice.
+Takes a list of strings matched by zwgc-summary-regexp as an argument.")
+
+;;; ------------------------------------------------------------------
+;;; Utilities -- these functions have nothing to do with zwgc mode.
+;;; They could (and should) be moved elsewhere.
+;;; ------------------------------------------------------------------
+
+(defun cadr (c) "Returns (car (cdr x))." (car (cdr c)))
+(defun cddr (c) "Returns (cdr (cdr x))." (cdr (cdr c)))
+
+(defun silent-replace-regexp (old new)
+  (save-excursion
+    (while (re-search-forward old (point-max) t)
+      (replace-match new))))
+
+(defun narrow-to-string (string)
+  "Insert STRING after point and narrow to the region containing it."
+  (interactive "sNarrow to string: ")
+  (narrow-to-region (point) (point))
+  (insert string)
+  (goto-char (point-min)))
+
+(defun replace-regexp-on-string (from to string)
+  "Replace occurences of regexp FROM with regexp TO in STRING; uses same
+rules as replace-regexp."
+  (save-excursion
+    (let ((buf (generate-new-buffer "  *tmp")))
+      (set-buffer buf)
+      (insert string)
+      (goto-char (point-min))
+      ; (perform-replace from to nil t nil) ; (replace-regexp from to)
+      (silent-replace-regexp from to)
+      (setq new-string (buffer-substring (point-min) (point-max)))
+      (kill-buffer buf)
+      new-string)))
+
+(defun split (string &optional regexp sep)
+  "Splits STRING into a list of strings by choosing breakpoints 
+according to REGEXP.  If REGEXP does not occur the entire STRING
+is contained in the first element of the returned list.  REGEXP is
+optional and defaults to [ \\t]+ (whitespace).  Optional third arg
+SEPARATORS causes the text that matches grouped expressions in REGEXP
+at each breakpoint to be included in the returned list.  If REGEXP
+matches the null string \"\", split will behave as if it matched a
+single character at that point; (split \"foo\" \" *\") --> (\"f\" \"o\" \"o\")"
+  (if regexp nil (setq regexp "[ \t]+"))
+  (let ((buf (generate-new-buffer "  *tmp")))
+    (unwind-protect 
+	(save-excursion
+	  (let* ((split-list (list 'split-list))
+		 (split-tail split-list))
+	    (set-buffer buf)
+	    (insert string)
+	    (goto-char (point-min))
+	    (let ((p (point)) mtext)
+	      (while (and (re-search-forward regexp nil t)
+			  (< (1+ p) (point-max)))
+		(if (/= (match-beginning 0) (match-end 0))
+		    (setcdr split-tail
+			    (list (buffer-substring p (match-beginning 0))))
+		  (setcdr split-tail (list (buffer-substring p (1+ p))))
+		  (forward-char 1))
+		(setq split-tail (cdr split-tail))
+		(setq mtext (matched-strings))
+		(if (and sep mtext)
+		    (progn
+		      (setcdr split-tail (list mtext))
+		      (setq split-tail (cdr split-tail))))
+		(setq p (point))))
+	    (setcdr split-tail (list (buffer-substring (point) (point-max))))
+	    (setq split-tail (cdr split-tail))
+	    (cdr split-list)))
+      (kill-buffer buf))))
+
+(defun last (lst)
+  "Return the pointer to last element of LIST or nil is LIST is nil.
+(setcdr (last l) (cons NEW-ELEMENT nil)) appends NEW-ELEMENT to the 
+end of l via mutation."
+  (nthcdr (1- (length lst)) lst))
+
+(defun filter (pred lst)
+  "Applies PREDICATE to each element of LIST, returning the list of
+all elemenets for which the predicate returns non-nil."
+  (cond ((null lst) nil)
+	((funcall pred (car lst))
+	 (cons (car lst) (filter pred (cdr lst))))
+	(t (filter pred (cdr lst)))))
+
+(defun matched-strings-list ()
+  "Returns a list that contains each grouped subexpression matched in
+the previous regular-expression search."
+  (interactive)
+  ;; Skip the first pair of numbers since it is the ENTIRE matched string.
+  (let* ((data (cddr (match-data)))
+	(mlist (list 'mlist))
+	(mtail (last mlist)))
+    (while data
+      ;; XXX (match-data) is supposed to contain markers or nil.
+      ;; 18.55.160 on the Sun sometimes returns 0's, too.
+      (if (and (car data) (not (= 0 (car data))))
+	  (progn
+	    (setcdr mtail (list (buffer-substring (car data) (cadr data))))
+	    (setq mtail (cdr mtail))))
+      (setq data (cddr data)))
+    (cdr mlist)))
+
+(defun matched-strings ()
+  "Returns a single string that is the concatenation of all the parenthesized
+expressions in the previous regular-expression search."
+  (interactive)
+  (apply 'concat (matched-strings-list)))
+
+(defun mapline (beg end f &rest args)
+  "With the point set to the beginning of each line between BEGIN and
+END, apply FUNCTION to ARGS and return a list of the result."
+  (let* ((p (point-marker))
+	(mlist (list 'mlist))
+	(mtail (last mlist)))
+    (save-restriction
+      (narrow-to-region beg end)
+      (goto-char (point-min))
+      (beginning-of-line)
+      (while (< (point) (point-max))
+	(save-excursion
+	  (setcdr mtail (list (apply f args)))
+	  (setq mtail (cdr mtail)))
+	(forward-line 1))
+      )
+    (goto-char p)
+    (cdr mlist)))
+  
+;;; ------------------------------------------------------------------
+;;; End of utilities
+;;; ------------------------------------------------------------------
+
+(defun zwgc-push-to-buffer ()
+  "Save the current window and buffer and move into the *zwgc* window,
+if it exists."
+  (let* ((buffer (current-buffer))
+	(window (selected-window))
+	(zwgc-buffer (get-buffer zwgc-bufnam))
+	(zwgc-window (get-buffer-window zwgc-buffer)))
+    
+    (if (or (not zwgc-window) (not zwgc-buffer))
+	(error "*zwgc* buffer not visible or does not exist")
+      (setq zwgc-buffer-stack (cons (cons buffer window) zwgc-buffer-stack))
+      (select-window zwgc-window)
+      (set-buffer zwgc-buffer))))
+
+(defun zwgc-pop-from-buffer ()
+  "Restore the previously pushed (with zwgc-push-to-buffer) window and buffer."
+  (if (not zwgc-buffer-stack)
+      (error "zwgc buffer stack is empty.")
+    (let ((p (car zwgc-buffer-stack)))
+      (setq zwgc-buffer-stack (cdr zwgc-buffer-stack))
+      (if (not (equal (cdr p) (next-window (previous-window (cdr p)))))
+	  nil
+	(select-window (cdr p))
+	(set-buffer (car p))))))
+
+(defun zwgc-pop-from-buffer-to-nowhere ()
+  "Delete the top element from zwgc-buffer-stack."
+  (if (not zwgc-buffer-stack)
+      (error "zwgc buffer stack is empty.")
+    (setq zwgc-buffer-stack (cdr zwgc-buffer-stack))))
+
+(defun zwgc-wrap-function (symbol)
+  "Returns a lambda expression that calls the function value of SYMBOL,
+wrapped by calls to zwgc-push-to-buffer and zwgc-pop-from-buffer."
+    (append '(lambda ())
+	    (list
+	     '(interactive)
+	     '(zwgc-push-to-buffer)
+	     (list 'unwind-protect
+		   (list 'funcall (list 'quote symbol))
+		   '(zwgc-pop-from-buffer))
+	     )))
+
+(defun zwgc-apply-cell (cell)
+  "CELL is (REGEXP . function).  Calls function with the argument
+match-data if REGEXP matches the current notice."
+  (save-excursion
+    (goto-char (point-min))
+    (let ((regexp (car cell)) (f (cdr cell)))
+      (if (re-search-forward regexp nil t)
+	  (progn
+	    (condition-case err
+		(funcall f (match-data))
+	      (error
+	       (message (format "zwgc: received %s applying %s" err cell))
+	       (ding 1)
+	       ))))
+      )))
+
+(defun zwgc-notice-iter (p &rest args)
+  "Calls FUNCTION on each zwgc notice in turn, passing it ARGS.
+FUNCTION must return t if it deletes the notice with zwgc-punt.
+Called interatively, prompts for a symbol to call as FUNCTION, with no
+args."
+  (interactive "aFunction to iterate: ")
+  (let ((n 0) (save-notice zwgc-current-notice))
+    (zwgc-push-to-buffer)
+    (while (<= (setq n (1+ n)) zwgc-notices)
+      (zwgc-nth-notice n t)
+      (if (eq (apply p args) t)
+	  (setq n (1- n)))
+      )
+    (if (< save-notice zwgc-notices)
+	(zwgc-nth-notice save-notice)
+      (zwgc-nth-notice zwgc-notices))
+    (zwgc-pop-from-buffer)
+    ))
+
+(defun zwgc-summary (regexp)
+  "Produces a summary of all notices in the *zwgc* buffer by putting
+the matched data from a regexp search in the *zwgc-summary* buffer (if
+zwgc-summary-hook is defined, it is called with the list of matched
+strings and its return value is used).  Uses zwgc-summary-regexp if it
+is defined, or prompts for a regexp if it isn't or if a prefix
+argument is given."
+  (interactive (list (or (and (not current-prefix-arg)
+			      zwgc-summary-regexp)
+			 (read-string "Summary regexp: "))))
+  (if (get-buffer "*zwgc-summary*")
+      (kill-buffer "*zwgc-summary*"))
+  (let ((buffer (get-buffer-create "*zwgc-summary*")))
+    (zwgc-notice-iter
+     (function (lambda (b)
+		 (let ((found (re-search-forward regexp nil t))
+		       (summary nil))
+		   (if found
+		       (progn
+			 (if zwgc-summary-hook
+			     (setq summary
+				   (apply (symbol-value 'zwgc-summary-hook)
+					  (matched-strings-list)))
+			   (setq summary (matched-strings)))
+			 (save-excursion
+			   (set-buffer b)
+			   (insert summary "\n"))
+			 )))))
+     buffer)
+    (pop-to-buffer buffer)
+    ))
+
+(defun zwgc-eonp (string)
+  ;; Returns t if the string ends with zwgc-notifications-terminator,
+  ;; nil otherwise.
+  (let* ((znt zwgc-notifications-terminator)
+	 (znt-len (length znt)))
+    (and (>= (length string) znt-len)
+	 (equal (substring string (- znt-len)) znt))))
+
+(defun zwgc-initial-wakeup (proc string)
+  ;; Called for the *first* output from zwgc only.. this is a hack.
+  (save-excursion
+    (set-buffer (get-buffer zwgc-bufnam))
+    (run-hooks 'zwgc-running-hook))
+  (set-process-filter proc 'zwgc-wakeup)
+  (zwgc-wakeup proc string)
+  )
+
+(defun zwgc-wakeup (proc string)
+  ;; Does *NOT* use the proc argument.
+
+  (let* ((string (replace-regexp-on-string "\r" "" string))
+	 (split-list (split string zwgc-notifications-terminator)))
+
+    ;; Everything except the last element is guaranteed to be the end
+    ;; of a notice.
+    (while (cdr split-list)
+      (zwgc-wakeup-2 (car split-list) t)
+      (setq split-list (cdr split-list)))
+
+    ;; The last element is part of a notice if it is not "".
+    (if (not (equal (car split-list) ""))
+	(zwgc-wakeup-2 (car split-list) nil))
+    ))
+
+(defun zwgc-wakeup-2 (string end-of-notice)
+  (setq zwgc-current-data (concat zwgc-current-data string))
+  (if end-of-notice
+      (let* ((zwgc-buffer (get-buffer zwgc-bufnam))
+	     (zwgc-window (get-buffer-window zwgc-buffer))
+	     (zwgc-start (and zwgc-window (window-start zwgc-window)))
+	     )
+	(save-excursion
+	  (set-buffer zwgc-buffer)
+	  (widen)
+	  (goto-char (point-max))
+	  (insert zwgc-current-data zwgc-notifications-terminator)
+	  (setq zwgc-notices (1+ zwgc-notices))
+	  (if (= zwgc-current-notice 0)
+	      (setq zwgc-current-notice 1))
+	  (setq zwgc-current-data nil)
+	  
+	  ;; Really be at last notice, call hooks.
+	  (zwgc-nth-notice zwgc-notices t)
+	  (mapcar 'zwgc-apply-cell zwgc-notice-regexp-alist)
+	  (run-hooks 'zwgc-got-notice-hook)
+	  )
+
+	(if (< zwgc-notices 1) nil
+ 	  (zwgc-pop-up-window (get-buffer zwgc-bufnam) zwgc-jump-on-new)
+	  (if zwgc-warp-to-new
+	      (zwgc-last-notice)
+	    (zwgc-current-notice)
+	    (if zwgc-start
+		(set-window-start zwgc-window zwgc-start))
+	    (if (not zwgc-auto-popup-window)
+		(zwgc-hide))
+	    ))
+	)))
+
+(defun zwgc-resize-window ()
+  "Resizes the zwgc window to the current notice (within the
+constraints of zwgc-window-{min,max}-height).  The *zwgc* buffer must
+be visible and selected."  
+  (if (one-window-p) 
+      nil 
+    (setq lines (1+ (count-lines (point-min) (point-max))))
+    (if (> lines zwgc-window-max-height)
+	(setq lines zwgc-window-max-height)
+      (if (< lines zwgc-window-min-height)
+	  (setq lines zwgc-window-min-height))
+      )
+    (enlarge-window (- lines (window-height (selected-window))))
+    ))
+
+;;;
+;;; Notice selecting/deleting functions
+;;;
+
+(defun zwgc-nth-notice (n &optional nodisplay)
+  (if (or (< n 1) (> n zwgc-notices))
+      (error "No such notice: %d" n))
+  (let ((beg))
+    (if nodisplay nil (zwgc-push-to-buffer))
+    (unwind-protect
+	(progn
+	  (save-restriction
+	    (widen)
+	    (goto-char (point-min))
+	    
+	    (if (= n 1)
+		(setq beg (point))
+	      (if (search-forward zwgc-notifications-terminator nil t (1- n))
+		  (setq beg (point))
+		(error "Rep invariant failure in zwgc!"))))
+	  
+	  (widen)
+	  (goto-char beg)
+	  (if (not (search-forward zwgc-notifications-terminator nil t))
+	      (error "Rep invariant failure in zwgc!"))
+	  (forward-char (- (length zwgc-notifications-terminator)))
+	  (narrow-to-region beg (point))
+	  (set-marker (mark-marker) (point-max))
+	  (goto-char (point-min))
+
+	  (if nodisplay nil
+	    (setq zwgc-current-notice n)
+	    (setq mode-line-process (format " %d/%d" n zwgc-notices))
+	    (zwgc-resize-window))
+	  )
+      
+      (if nodisplay nil (zwgc-pop-from-buffer)))
+    ))
+
+(defun zwgc-first-notice ()
+  (interactive)
+  (zwgc-nth-notice 1))
+
+(defun zwgc-next-notice ()
+  "Display the next notice in the *zwgc* buffer."
+  (interactive)
+  (zwgc-nth-notice (1+ zwgc-current-notice)))
+
+(defun zwgc-prev-notice ()
+  "Display the previous notice in the *zwgc* buffer."
+  (interactive)
+  (zwgc-nth-notice (1- zwgc-current-notice)))
+
+(defun zwgc-current-notice ()
+  "A peculiar command used to reset the narrowed region after a 
+notice has been deleted."
+  (interactive)
+  (zwgc-nth-notice zwgc-current-notice))
+
+(defun zwgc-last-notice ()
+  (interactive)
+  (zwgc-nth-notice zwgc-notices))
+
+(defun zwgc-punt (&optional nodisplay)
+  "Delete the current Zephyr notice.  Optional argument NODISPLAY
+means not to display the new current notice after punting.  Returns t."
+  (interactive)
+
+  ;; Sanity check
+  (if (< zwgc-notices 1)
+      (error "No notices to punt!"))
+
+  (let ((window-min-height 1) (buffer (current-buffer)) (beg) (end))
+
+    (set-buffer (get-buffer zwgc-bufnam))
+    (setq beg (point-min))
+    (setq end (+ (point-max) (length zwgc-notifications-terminator)))
+    (setq zwgc-notices (1- zwgc-notices))
+    (if (> zwgc-current-notice zwgc-notices)
+	(setq zwgc-current-notice zwgc-notices))
+
+    (widen)
+    (delete-region beg end)
+    (if (= 0 zwgc-notices)
+	(progn
+	  (setq mode-line-process " 0/0")
+	  (if (not zwgc-bury-buffer)
+	      (if (eq (selected-window) (get-buffer-window zwgc-bufnam))
+		  (other-window 1))
+	    (if (not (one-window-p))
+		(progn 
+		  (delete-windows-on zwgc-bufnam)
+		  (bury-buffer zwgc-bufnam)))))
+      (if (not nodisplay)
+	  (zwgc-current-notice))
+      )
+    
+    (run-hooks 'zwgc-killed-notice-hook)
+    (set-buffer buffer)
+    t))
+
+
+(defun zwgc-punt-regexp (regexp)
+  "Cause zwgc to ignore all zwgc notices that match REGEXP.  With a
+prefix, does the opposite operation."
+  (interactive (list (if current-prefix-arg
+			 (read-string "Regexp to unpunt: ")
+		       (read-string "Regexp to punt: "))))
+  (let ((cell (cons regexp 'zwgc-punt)))
+    (if current-prefix-arg
+	(setq zwgc-notice-regexp-alist
+	      (filter (function (lambda (x) (not (equal cell x))))
+		      zwgc-notice-regexp-alist))
+      (setq zwgc-notice-regexp-alist (cons cell zwgc-notice-regexp-alist)))
+    ))
+
+(defun zwgc-reply ()
+  "Performs a regular-expression search on the current notice with the
+car of zwgc-reply-cell as the regexp and then calls the cdr of
+zwgc-reply-cell with the match data as an argument."
+  (interactive)
+  (if (not zwgc-reply-cell)
+      (error "zwgc-reply-cell is not defined.")
+    (zwgc-push-to-buffer)
+    (zwgc-apply-cell zwgc-reply-cell)
+    (zwgc-pop-from-buffer)))
+
+(defun zwgc-show ()
+  (interactive)
+  (zwgc-pop-up-window (get-buffer zwgc-bufnam) nil))
+		     
+(defun zwgc-hide ()
+  "Bury the *zwgc* buffer (make it the least likely to be selected by
+\\[switch-to-buffer]) and delete the window it is in."
+  (interactive)
+  (zwgc-push-to-buffer)
+  (bury-buffer)
+  (if (one-window-p t) nil
+    (delete-window))
+  (zwgc-pop-from-buffer-to-nowhere)
+  )
+  
+(defun kill-zwgc nil
+  "Kill the zwgc subprocess and the *zwgc* buffer."
+  (interactive)
+  (let* ((buf (get-buffer zwgc-bufnam))
+	(win (get-buffer-window buf))
+	proc)
+    (if (not (and buf
+		  (setq proc (get-buffer-process buf))
+		  (eq (process-status proc) 'run)))
+	(error "No zwgc process currently running."))
+    (interrupt-process proc)  
+    (sit-for 1)
+    (delete-process proc)
+    (kill-buffer buf)
+    (if (and win (not (one-window-p)))
+	(delete-window win))
+    (run-hooks 'zwgc-killed-hook)
+    ))
+
+(defun start-zwgc ()
+  "Start the zwgc process."
+  (let ((buffer (get-buffer zwgc-bufnam)) status)
+    (setq zwgc-process (get-buffer-process buffer))
+    (if zwgc-process (setq status (process-status zwgc-process)))
+    (save-excursion
+      (set-buffer buffer)
+      (if (memq status '(run stop))
+          nil
+        (if zwgc-process (delete-process zwgc-process))
+        (setq zwgc-process 
+	      (let ((process-environment (append  zwgc-environment
+						  process-environment))
+		    process-connection-type)
+		(apply 'start-process "Zwgc" buffer zwgc-prog "-ttymode"
+		       "-nofork" "-f" zwgc-description-file
+		       zwgc-prog-additional-args)))
+	(set-process-sentinel zwgc-process 'zwgc-sentinel)
+	(set-process-filter zwgc-process 'zwgc-initial-wakeup))
+      )))
+
+(defun zwgc ()
+  "Run zwgc as a subprocess."
+  (interactive)
+  (let ((buffer (get-buffer-create zwgc-bufnam)))
+    (save-excursion
+      (set-buffer buffer)
+      (zwgc-mode)
+      (start-zwgc))
+    ))
+
+(defun zwgc-mode ()
+  "\\<zwgc-mode-map>Major mode for receiving and viewing Zephyr
+notices.  Each time a notice is received it is displayed in the *zwgc*
+window (which is created at the bottom of the screen if it does not
+already exist).  When a notice is deleted with \\[zwgc-punt], the next
+notice in the queue is displayed or, if there are no more notices, the
+window disappears.
+
+Each zephyr notice is expected to end with the value of the variable
+zwgc-notifications-terminator (\"^L\\n\" by default).  The are several
+variables that otherwise control the behavior of zwgc mode; UTFL.
+
+All normal editing commands are turned off.  Instead, the following
+commads are defined:
+
+\\[zwgc-next-notice]		Move to next notice.
+\\[zwgc-prev-notice]		Move to previous notice.
+\\[zwgc-first-notice]		Move to first notice.
+\\[zwgc-last-notice]		Move to last notice.
+\\[zwgc-current-notice]		``Move'' to current notice.
+\\[zwgc-punt]		Delete current notice.
+\\[zwgc-hide]		Hide the *zwgc* buffer until a notice is received.
+\\[zwgc-show]		Display the *zwgc* buffer.
+\\[zwgc-summary]		Produce a summary of notice headers.
+\\[kill-zwgc]		Kill the zwgc subprocess and *zwgc* buffer.
+\\[zwgc-zpunt]		Punt/unpunt notices with zpunt.
+\\[zwgc-punt-regexp]		Punt/unpunt notices matching regexp.
+\\[zwgc-zctl-cmd]		Perform a 'zctl' command.
+\\[zwgc-call-process]		Execute a program in zwgc's environment.
+\\[zwgc-znol-mode-map]		Prefix key for *znol* buffer commands.
+\\[write-region]		Write current notice to file.
+\\[copy-region-as-kill]		Copy current notice as if killed.
+\\[describe-mode]		This help message."
+  (interactive)
+  (kill-all-local-variables)
+  (setq major-mode 'zwgc-mode)
+  (setq mode-name "zwgc")
+  (put 'zwgc-mode 'mode-class 'special)
+  (setq mode-line-format ; The default modulo %n
+	'("" mode-line-modified mode-line-buffer-identification "   " 
+	  global-mode-string "   %[(" mode-name minor-mode-alist 
+	  mode-line-process ")%]----" (-3 . "%p") "-%-"))
+
+  (save-excursion
+    (set-buffer (get-buffer zwgc-bufnam))
+    (delete-region (point-min) (point-max)))
+  (setq zwgc-notices 0)
+  (setq zwgc-current-notice 1)
+  (setq zwgc-mode-map nil)
+  (if zwgc-mode-map
+      nil
+    (define-prefix-command 'zwgc-mode-map)
+    (setq zwgc-mode-map (symbol-function 'zwgc-mode-map))
+    (suppress-keymap zwgc-mode-map)
+    (define-key zwgc-mode-map "h" 'describe-mode)
+    (define-key zwgc-mode-map "?" 'describe-mode)
+    (define-key zwgc-mode-map "<" 'zwgc-first-notice)
+    (define-key zwgc-mode-map ">" 'zwgc-last-notice)
+    (define-key zwgc-mode-map "n" 'zwgc-next-notice)
+    (define-key zwgc-mode-map "p" 'zwgc-prev-notice)
+    (define-key zwgc-mode-map "." 'zwgc-current-notice)
+    (define-key zwgc-mode-map "r" 'zwgc-reply)
+    (define-key zwgc-mode-map "\177" 'zwgc-punt)
+    (define-key zwgc-mode-map "d" 'zwgc-punt)
+    (define-key zwgc-mode-map "q" 'zwgc-hide)
+    (define-key zwgc-mode-map "s" 'zwgc-show)
+    (define-key zwgc-mode-map "K" 'kill-zwgc)
+    (define-key zwgc-mode-map "\M-w" (zwgc-wrap-function 'copy-region-as-kill))
+    (define-key zwgc-mode-map "w" (zwgc-wrap-function 'write-region))
+    (define-key zwgc-mode-map " " (zwgc-wrap-function 'scroll-up))
+    (define-key zwgc-mode-map "\M-p" 'zwgc-zpunt)
+    (define-key zwgc-mode-map "\C-\M-p" 'zwgc-punt-regexp)
+    (define-key zwgc-mode-map "h" 'zwgc-summary)
+    (define-key zwgc-mode-map "c" 'zwgc-zctl-cmd)
+    (define-key zwgc-mode-map "x" 'zwgc-call-process)
+    (define-key zwgc-mode-map "l" 'zwgc-znol-mode-map)
+    )
+  (use-local-map zwgc-mode-map)
+  (run-hooks 'zwgc-mode-hook)
+  )
+
+;; Called when zwgc loses.  If it exited, restart it; if it was
+;; killed, do nothing (let it die).
+(defun zwgc-sentinel (process signal)
+  (let ((buffer (process-buffer process))
+	(status (process-status process)))
+    (cond ((eq status 'exit)
+	   (if (equal signal "finished\n")
+	       nil
+	     (ding)
+	     (message "zwgc: %s, restarting" (substring signal 0 -1))
+	     (start-zwgc)))
+	  ((eq status 'signal)
+	   nil)
+	  (t
+	   (ding)
+	   (message "zwgc: sentinel called for unknown reason!"))
+	  )))
+
+;;;
+;;; zwgc-related process functions
+;;;
+
+(defun zwgc-start-process (name buffer program &rest args)
+  "Exactly like start-process except that zwgc-environment is added to
+the process environment."
+  (let ((process-environment (append zwgc-environment process-environment)))
+    (apply 'start-process name buffer program args)))
+
+(defun zwgc-call-process (program &optional infile buf-or-name dsp
+				  &rest args)
+  "Exactly like call-process except that zwgc-environment is added to
+the processes environment.  Called interactively, prompts for a string
+which is the program to run plus any arguments.  Output is discarded
+unless there is a prefix argument, in which case it is inserted into
+the current buffer."
+  (interactive
+   (let ((prog (split (read-string "Program to run: ")))
+	 (arg (not (null current-prefix-arg))))
+     (append (list (car prog) nil arg arg) (cdr prog))))
+    
+  (let ((process-environment (append zwgc-environment process-environment)))
+    (apply 'call-process program infile buf-or-name dsp
+	   (filter 'identity args))))
+
+(defun zwgc-zpunt (arg1 &optional arg2 arg3)
+  "Called interactively, prompts for a string of the form
+'string1[,string2[,string3]' and passes the strings separately as
+arguments to zwgc-zpunt-prog.  Called non-interactively, takes one
+string and optionally two more that are passed to zwgc-zpunt-prog.
+The program is executed with the same environment as zwgc.
+
+With a prefix argument, uses zwgc-zunpunt-prog instead."
+  (interactive (split (if current-prefix-arg
+			  (read-string "String to zunpunt: ")
+			(read-string "String to zpunt: "))
+		      "[ ,]+"))
+  (if current-prefix-arg
+      (zwgc-call-process zwgc-zunpunt-prog nil nil nil arg1 arg2 arg3)
+    (zwgc-call-process zwgc-zpunt-prog nil nil nil arg1 arg2 arg3)))
+
+(defun zwgc-zctl-cmd (&rest args)
+  "Takes any number of arguments and passes then to zwgc-zctl-prog,
+running the program with the same environment as zwgc.  Called
+interactively, prompts for a string that are the arguments to pass."
+  (interactive (split (read-string "Zctl command: ") "[ ]+"))
+  (apply 'zwgc-call-process zwgc-zctl-prog nil nil nil args))
+
+(defun zwgc-pop-up-window (ignored &optional leave)
+  ;; Note: This function *DOES NOT* use pop-to-buffer.  Keep it that way.
+  (let* ((retwin (selected-window))
+         (pop-up-windows t)
+         (window-min-height 1)
+	 (zwgc-window (get-buffer-window zwgc-bufnam))
+	 )
+
+    ;; If the window does not already exist, create it
+    (if zwgc-window nil
+      (split-window (previous-window (minibuffer-window)))
+      (setq zwgc-window (previous-window (minibuffer-window)))
+      )
+
+    ;; Now, whether it was there or not, put the *zwgc* buffer in it,
+    ;; resize, and return (or leave).
+    (select-window zwgc-window)
+    (switch-to-buffer zwgc-bufnam)
+    (zwgc-resize-window)
+    (select-window retwin)
+    (if (and leave (equal (window-buffer retwin) buffer))
+        (other-window 1))
+    ))
+
+;;;
+;;; Other random stuff.
+;;;
+
+(defun zwgc-do-autoload (symbol)
+  "Loads the file SYMBOL autoloads from, it SYMBOL is autoloaded."
+  (let ((l (symbol-function symbol)))
+    (if (eq (car l) 'autoload)
+	(progn
+	  (load-library (car (cdr l)))
+	  (if (eq (car (symbol-function symbol)) 'autoload)
+	      (error "Autoloading failed to define function %s"
+		     (symbol-name symbol)))))))
+
+(defun zwgc-install-window-functions ()
+  "Installs replacements for C-x 0, C-x 1, and C-x 2 that try hard 
+to keep the *zwgc* buffer displayed and fixed in size."
+  (interactive)
+  (define-key global-map "\C-x0" 'zwgc-hacked-delete-window)
+  (define-key global-map "\C-x1" 'zwgc-hacked-delete-other-windows)
+  (define-key global-map "\C-x2" 'zwgc-hacked-split-window)
+  (zwgc-do-autoload 'zwgc-pop-to-buffer)
+  (fset 'pop-to-buffer (symbol-function 'zwgc-pop-to-buffer))
+  )
+
+(defun zwgc-autoload (symbol file doc)
+  (autoload symbol (concat zwgc-load-dir "/" file) doc t nil))
+
+;;;
+;;; Finally, all the code that is executed goes here, at the end.
+;;;
+
+(defun zwgc-startup ()
+  (zwgc-autoload 'zwgc-znol "zwgc-znol"
+		 "This is the main entry point for *znol* with emacs zwgc.")
+  (zwgc-autoload 'zwgc-hacked-delete-window "zwgc-window"
+		 "delete-window without resizing *zwgc* window")
+  (zwgc-autoload 'zwgc-hacked-delete-other-windows "zwgc-window"
+		 "delete-other-windows without resizing *zwgc* window")
+  (zwgc-autoload 'zwgc-hacked-split-window "zwgc-window"
+		 "split-window without resizing *zwgc* window")
+  (zwgc-autoload 'zwgc-pop-to-buffer "zwgc-window"
+		 "pop-to-buffer that will not choose *zwgc*")
+  
+  ;; So this function gets GC'ed
+  (fmakunbound 'zwgc-startup)
+  )
+(zwgc-startup)
+
+@

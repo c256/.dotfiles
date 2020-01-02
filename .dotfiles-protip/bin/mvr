@@ -1,0 +1,62 @@
+#!/bin/csh -f
+if ( $#argv < 3 ) then
+   echo "usage: mvr [-n|-i] [-u|-l] RE replacement file ...\
+\
+       File rename utility, where "\`"RE' is substituted by "\`"replacement'\
+       in each file name, sed(1) style.  Asks before each file to be\
+       renamed.  Reports back on files that did not match the RE conditions.\
+       Beware that both strings ("\`"RE' and "\`"replacement') may need to be\
+       quoted.\
+       Options are:  -n  don't ask, just log to standard output\
+                     -i  ask for each file to be renamed (the default)\
+                     -u  make filenames uppercase\
+                     -l  make filenames lowercase"
+   exit 1
+endif
+set ccase="" ask
+while ( "$1" =~ -* )
+   if ( "$1" == "-n" ) unset ask
+   if ( "$1" == "-i" ) set ask
+   if ( "$1" == "-u" ) set ccase = 'tr a-z A-Z'
+   if ( "$1" == "-l" ) set ccase = 'tr A-Z a-z'
+   shift
+end
+set skipped
+set re1 = "$1"
+set re2 = "$2"
+shift
+while ( "$2" != "" )
+   shift
+   if ( ! -e "$1" ) then
+      echo \"$1\" nonexistent
+      continue
+   endif
+
+   if ( "$ccase" != "" ) then
+      set j=`echo "$1" | eval $ccase | sed "s,$re1,$re2,g"`
+   else
+      set j=`echo "$1" | sed "s,$re1,$re2,g"`
+   endif
+   if ( "$1" == "$j" ) then
+      set skipped = ( $skipped $1 )
+      continue
+   endif
+   if ( "$j" == "" ) then
+      echo -n Really rename \""$1"\" to \""$j"\"", i.e. remove it ? (n) "
+      set y=$<
+      if ( "$y" == "" || "$y" == "n" || "$y" == "no" ) continue
+   else if ( $?ask ) then
+      echo -n Rename \""$1"\" to \""$j"\"" ? (y) "
+      set y=$<
+      if ( "$y" != "y" && "$y" != "yes" && "$y" != "" ) continue
+   else
+      echo Renaming \"$1\" to \"$j\"
+   endif
+   mv "$1" "$j"
+   set renamed
+end
+if ( $?renamed == 0 ) then
+   echo "No files renamed."
+else if ( "$skipped" != "" ) then
+   echo "Not renamed: $skipped"
+endif

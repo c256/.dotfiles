@@ -1,0 +1,65 @@
+#!/bin/csh -f
+#
+# .xsession
+# My X session initialization file.
+#
+
+set path 	= ( /mit/yandros/bin /srvd/patch \
+      	      	    /usr/athena/bin /bin/athena \
+      	      	    /usr/bin/X11 /usr/new /usr/ucb /bin /usr/bin )
+
+echo " "
+echo -n "Login"
+
+xhost -localhost - >&  /dev/null
+echo -n "."
+
+setenv XSESSION $$
+echo $$ >> /tmp/xsession_pid
+echo -n "."
+
+source ~/.environment
+echo -n "."
+
+source ~/.lockers
+echo -n "."
+
+source ~/.path
+echo -n "."
+
+xrdb -load ~/.Xresources
+echo -n "."
+
+if (-r ~/arch/@sys/lib/xmodmaprc) then
+#	xmodmap ~/arch/@sys/lib/xmodmaprc
+	echo -n "."
+endif
+
+xsetroot -solid black
+echo -n "."
+
+swirlcursor
+echo -n "."
+
+xterm -name Initial &
+echo -n "."
+
+ctwm-beta -W &
+echo -n "."
+
+echo -n "complete"  		# Ok, so it's not really.  Sue me.
+echo " "
+
+sleep 3				# glah. stupid X server
+config_console
+
+session_gate
+
+if (! -f ~/.nodotlogout ) then
+  source ~/.logout
+  kdestroy
+  setenv KRBTKFILE /tmp/tkt_yr ; kdestroy
+  echo "Made sure"
+  unsetenv KRBTKFILE 
+endif
+

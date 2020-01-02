@@ -1,0 +1,4 @@
+" Config for macvim
+
+colorscheme evening
+set guifont=Anonymous\ Pro:h18

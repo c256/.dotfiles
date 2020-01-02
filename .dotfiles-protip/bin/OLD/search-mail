@@ -1,0 +1,3 @@
+#!/bin/sh
+
+exec glimpse -H $HOME/.Private/mh-mail "$@"

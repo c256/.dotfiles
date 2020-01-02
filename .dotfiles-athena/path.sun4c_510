@@ -1,0 +1,33 @@
+# beware
+#
+# Chad Brown
+# yandros@ATHENA.MIT.EDU
+#
+
+if (! $?hosttype) set hosttype = `/bin/athena/machtype`
+if (! $?bindir) set bindir = `/bin/athena/machtype`bin
+
+## My personal version of $athena_path
+set athena_path=( /srvd/patch /usr/athena/bin /bin/athena /usr/openwin/bin \
+                  /usr/openwin/demo /usr/ucb /usr/sbin /sbin /usr/bin \
+                  /usr/ccs/bin )
+
+
+set path = ( ~/bin /mit/sipb/bin /mit/outland/bin /mit/gnu/bin \
+       	     /mit/emacs/beta/bin /mit/emacs/bin /mit/emacs19/bin \
+             /afs/athena/system/afsuser/arch/@sys/bin \
+	     /mit/infoagents/bin /mit/mime/bin \
+      	     /afs/net/tools/@sys /usr/local/bin \
+             /mit/java/bin \
+       	     /etc/athena /usr/athena/etc  \
+       	     $athena_path )
+
+
+setenv MANPATH ~/man:/mit/sipb/man:/mit/outland/man:/mit/watchmaker/man:/usr/athena/man:/usr/man
+
+setenv XFILESEARCHPATH ./%N:$HOME/lib/X11/%T/%N:/mit/sipb/share/%T/%N%S:/mit/x11/${HOSTTYPE}lib/X11/%T/%N:/usr/athena/lib/X11/%T/%N:/usr/lib/X11/%T/%N:/usr/openwin/lib/locale/%L/%t/%N%S:/usr/openwin/lib/%T/%N%S
+
+setenv PERLLIB $HOME/lib/perl:/afs/athena.mit.edu/contrib/perl/lib:/usr/athena/lib/perl
+
+setenv LD_LIBRARY_PATH /usr/openwin/lib
+setenv OPENWINHOME /usr/openwin

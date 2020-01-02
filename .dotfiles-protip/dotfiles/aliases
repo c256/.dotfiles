@@ -1,0 +1,22 @@
+# tcsh 6 aliases : yandros@mit.edu
+
+alias dq 'df -k $HOME'
+
+alias cp 'cp -i'
+alias mv 'mv -i'
+alias j 'jobs -l'
+alias cd 'pushd'
+alias bd 'popd'
+alias l 'ls -lFGh'
+alias ll 'ls -laFGh'
+alias clean 'rm -i ./*~ ./.*~'
+alias wgrep 'egrep \!* /usr/share/dict/words'
+
+### (modified) system default aliases
+alias term 'set noglob; unsetenv TERMCAP; eval `tset -s -I -Q - \!*`'
+#alias renew 'kinit $USER && aklog sipb ath net zone && zctl load /dev/null'
+
+#
+# Private aliases
+# 
+if (-r $HOME/.Private/aliases) source $HOME/.Private/aliases

@@ -1,0 +1,7 @@
+#!/bin/sh -x
+
+rm -rf $HOME/.netscape/cache
+rm $HOME/.netscape/history.dat
+rm $HOME/.netscape/history.list
+rm $HOME/.netscape/cookies
+rm -rf $HOME/nsmail

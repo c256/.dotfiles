@@ -1,0 +1,32 @@
+#!/usr/bin/perl -w
+
+$req = "http://stuff.mit.edu/cgi/zlocate?";
+
+&usage unless (@ARGV >0);
+
+foreach $user (@ARGV) {
+    $req = "$req$user+";
+}
+
+$command = "curl -s -A \"ChadZlocate 1.1\" $req";
+#$command = "links -source $req";
+#print $command . "\n";
+
+$response = `$command`;
+$response =~ s/<pre>//g;
+$response =~ s/<a href.*\">//g;
+$response =~ s/<\/a>//g;
+$response =~ s/\@ATHENA\.MIT\.EDU//g;
+$response =~ s/:\n/: /g;
+@response = split("\n", $response);
+
+my $len = @response-2;
+my $i = 4;
+while ($i < $len) {
+    print "$response[$i]\n";
+    $i++;
+}
+
+sub usage {
+    die "Usage: zlocate username [username ...]\n"
+}

@@ -1,0 +1,388 @@
+# My zephyr client description file
+#
+# Chad Phillip Brown
+# yandros@MIT.EDU
+#
+
+#
+# save unmodified copies of these variables, because we're going to
+# muck with them later.
+#
+set _auth=       $auth
+set _class=      $class
+set _instance=   $instance
+set _opcode=     $opcode
+set _fromhost=   $fromhost
+set _sender=     $sender
+set _fullsender= $fullsender
+set _recipient=  $recipient
+set _message=    $message
+
+#
+# protect some things
+#
+set signature = "@{" + protect($signature) + "}"
+set body = protect($body)
+set sender = protect($sender)
+
+#
+# variable initialization
+#
+set xbm_command = "ee"
+set xbm_file    = "/tmp/zbitmap.y"
+set logfile	= "/mit/yandros/.Private/zlogs"
+set lotta__s	= "______________________________________"
+
+#
+# Strip the .mit.edu off the fromhost, if it's there.
+#
+if (rany($fromhost,".MIT.EDU") != ".MIT.EDU") then
+  set fromhost = $_fromhost
+endif
+
+#
+# Similarly, strip the @athena.mit.edu from the recipient...
+#
+if (rany($recipient,"@ATHENA.MIT.EDU") != "@ATHENA.MIT.EDU") then
+  set recipient = $_recipient
+endif
+
+#
+# and finally, get those ugly RCN addresses too.
+#
+if (rany($fromhost,".sbo-smr.ma.cable.rcn.com") != ".sbo-smr.ma.cable.rcn.com") then
+  set fromhost = $_fromhost
+endif
+
+
+
+#
+# Make the display of authenticity a little smaller
+#
+case $auth
+match "yes"
+  set aval = "A"
+match "no"
+  set aval = "@b[U]"
+match "forged"
+  set aval = "@b[F]"
+endcase
+
+#
+# Group zgrams by class
+case $class
+
+match "WG_CTL_CLASS"
+  #
+  # Startup message; do some setup here.
+  #
+  if ($opcode == "WG_STARTUP") then
+      #
+      # Check for emacs-zwgc
+      #
+      if ($output_driver == "tty") then
+      	  set endmarker = "\014\n"
+      else
+      	  set endmarker = ""
+      endif
+      #
+      # Check to see if we should grab our colors at startup
+      #
+      set grabcolors = zvar("grabcolors")
+      #
+      # Punt pings?
+      #
+      set puntpings = zvar("puntpings")
+      #
+      # Beep on personals?
+      #
+      set nomeeps = zvar("nomeeps")
+      #
+      # setup logfile
+      # 
+      exec "touch" $logfile
+      appendport "logfile" $logfile
+      #
+      # Show the startup-zgram
+      # 
+      if (downcase($grabcolors) == "true") then
+          # allocate all of our colors now...
+          # Neat hack I found in Tom's setup.
+          print "@color(NavajoWhite)--"
+          print "@color(BlueViolet)--"
+          print "@color(DeepSkyBlue)--"
+          print "@color(SteelBlue)--"
+          print "@color(SkyBlue)--"
+          print "@color(SlateGray)--"
+          print "@color(LightSteelBlue)--"
+          print "@color(MidnightBlue)--"
+          print "@color(White)--"
+          print "\n@color(white)"
+      else
+      	  print "------------------\n"
+      endif
+      print " @b{Zwgc "+$version+" up... }\n"
+      if (downcase($grabcolors) == "true") then
+          print "@color(NavajoWhite)--"
+          print "@color(BlueViolet)--"
+          print "@color(DeepSkyBlue)--"
+          print "@color(SteelBlue)--"
+          print "@color(SkyBlue)--"
+          print "@color(SlateGray)--"
+          print "@color(LightSteelBlue)--"
+          print "@color(MidnightBlue)--"
+          print "@color(White)--"
+          print "\n@color(white)"
+      else
+      	  print "------------------\n"
+      endif
+      #
+      # view variable values
+      #
+      print "@small{"
+      print "  GrabColors: @r("+$grabcolors+"  )\n"
+      print "  PuntPings: @r("+$puntpings+"  )\n"
+      print "  NoMeeps: @r("+$nomeeps+"  )\n"
+      print "}"
+      #
+      # bottom marker, if grabbing the colormap entries
+      #
+      if (downcase($grabcolors) == "true") then
+          print "@color(NavajoWhite)--"
+          print "@color(BlueViolet)--"
+          print "@color(DeepSkyBlue)--"
+          print "@color(SteelBlue)--"
+          print "@color(SkyBlue)--"
+          print "@color(SlateGray)--"
+          print "@color(LightSteelBlue)--"
+          print "@color(MidnightBlue)--"
+          print "@color(White)--"
+      else
+      	  print "------------------\n"
+      endif
+      print $endmarker
+      put
+  endif
+  exit
+
+
+match "mail"
+  if ($auth != "yes") then
+      exit
+  endif
+  fields server servmsg mailfrom mailto subject
+  set mailfrom  = protect($mailfrom)
+  set mailto    = protect($mailto)
+  set subject   = protect($subject)
+  print "Mail from: @bold("+ $mailfrom +")\n: to @bold("+ $mailto +")\n:"
+  print "@c[@i("+ $subject +")]\n:"
+  print $endmarker
+  put
+  exit
+
+
+match "login"
+  case $opcode
+  match "USER_LOGIN"
+    set header =	"==>"
+    set state  =	"In:"
+    set footer =	"<=="
+  match "USER_LOGOUT"
+    set header =	"***"
+    set state  =	"Out:"
+    set footer =	"***"
+  default
+    set header =	"???"
+    set state  =	"Pizza!:"
+    set footer =	"???"
+  endcase
+  
+  fields host when display
+  print "@b("+ $header + $state +") "
+  print "@b{<@i("+ $sender +")@"+ $fromhost +">} "
+  print "at @i("+ $time +") from @i("+ $display +") "
+  print "@b("+ $footer +")\n"
+  print $endmarker
+  put
+  exit
+
+
+match "XSETROOT"
+  if ($opcode == "PING") then
+    print "@c(@bold(@i(BITMAP INCOMING!)))\n"
+    print "From: @bold(<"+$sender+">)\n"
+    print $endmarker
+    put
+  exit
+  endif
+  outputport "xbm" $xbm_file
+  put "xbm" $message
+  closeport "bitmap"
+  exec $xbm_command $xbm_file
+  exit
+
+
+match "discuss"
+  case $opcode
+  match "NEW_TRN"
+    set trntype = "New transaction"
+  default
+    print "\n\n New discuss opcode: "+$opcode+"\n\n"
+    set trntype = "???"
+  endcase
+  fields trn longname poster
+  print "@l{@b("+$trntype+":)} @r{@i("+$longname+")}\n"
+  print "@small["+$instance+":"+$trn+"]\n"
+  if ($poster != "daemon@ATHENA.MIT.EDU") then
+      print "@c("+ $poster +")\n"
+  endif
+  print $endmarker
+  put
+  exit 
+
+
+match "sendme"
+  #
+  # special form for my personal system messages
+  #
+  # Notify of unathentic messages
+  #
+  if (downcase($auth) != "yes") then
+    print "@c(@bold(Unauthentic Comminucation))\n"
+    print "@c(By:@bold(@i(<"+$_fullsender+">)))\n"
+    print "@c(From:@bold(@i(<"+$_fromhost+">)))\n"
+    print $endmarker
+    put	
+  endif
+  
+  fields signature body
+  if ($body == "") then
+      print"@c(Nil)@r("+ $opcode +")\n"
+      if ($sender != "yandros" ) then
+  	print"@c(From <"+$sender+"@"+$fromhost">)@r("+$opcode+")\n"
+      endif
+      print $endmarker
+      put 
+      exit
+  endif
+  print "@c(@bold(@i(<"+$sender+"@"+$fromhost+">)))@r("+$opcode+")\n"
+  print $body
+  print $endmarker
+  put
+  exit
+
+
+match "OLC"
+  if (upcase($opcode) == "PING") then
+  	exit
+  endif
+  /* print the formatted message */
+  fields signature body
+  if (upcase($instance) == "NEW_QUESTION") then
+      print "@l("+$aval+") @r(@b[New:]"+$opcode+")\n"
+  else
+      print "@l("+$aval+") @c("+$instance+") @r(@i("+$opcode+"))\n"
+  endif
+  if ((upcase($fullsender) != "OLC.MATISSE@ATHENA.MIT.EDU") &
+     (upcase($fromhost) != "MATISSE.MIT.EDU")) then
+      print "@c(<"+$fullsender+">)\n"
+      print "@c(<"+$fromhost+">)\n"
+      print "@c(<"+$signature+">)\n"
+      print "\n"
+  endif
+  print $body
+  print $endmarker
+  put
+  exit
+  
+
+match "syslog"
+  print "@b[Syslog:"+$aval
+  print " @c(@i{"+$sender+"}@"+$instance
+  print ") @r("+$opcode+")]\n\n"
+  print "@small("+protect($message)+")"
+  print $endmarker
+  put
+  exit
+
+
+match "noc"
+  if (upcase($sender) != "RCMD.WHOS_THERE") then
+      print "@large{@c["+$sender+"]}\n"
+  endif
+  fields signature status
+  print "@b[NOC:"+$aval+" @c("+$instance+":"+$status+") @r("+$time+")]"
+  print "\n"+$endmarker
+  put
+  exit
+
+
+match "filsrv"
+  fields signature body
+  set signature = protect($signature)
+  set body = protect($body)
+  print "@l{"+$aval+"}"
+  print " @c{<"+$instance+":"+$opcode+">} "
+  print "@r{"+$recipient+"}\n"
+  print "@l("+$signature+") @r(<"+$sender+"@"+$fromhost+">)\n"
+  print "\n"
+  print "@i("+$body+")"
+  print $endmarker
+  put
+  exit
+
+
+# most things go here...  it should probably be higer up
+default
+  #
+  # Kill pings... 
+  #
+  if (upcase($opcode) == "PING") then
+      if (upcase($puntpings) == "FALSE") then
+      	  print "Ping:@b(<@i("+$sender+")@"+$fromhost+">)"
+      	  print $endmarker
+      	  put
+      endif
+      exit
+  endif
+  #
+  # Format the zgram
+  #
+  fields signature body
+  case $class
+  match "Message"
+    set title = $instance+" : "+$recipient
+    if (upcase($instance) == "PERSONAL") then
+      	#
+      	# Personal logging.  This should probably be switched.
+      	#
+      	put "logfile" $aval+"   "+$title+"   ("+$opcode+")   "+
+      	      	      $date+" "+$time+"\n"+
+      	      	      "From: "+$signature+" <"+$sender+"@"+$fromhost+">\n\n"+
+      	      	      $body+
+      	      	      $lotta__s+"_"+$lotta__s+"\n\n"
+      	#
+      	# meeps
+      	#
+      	if (upcase($nomeeps) == "FALSE") then
+      	    print "@beep()"
+      	endif
+    endif
+  default
+    set title = "<"+$class+","+$instance+","+$recipient+">"
+  endcase
+  print "@l(@b{"+$aval+"}) @c("+$title+") @r("+$opcode+")\n"
+  print "From: "
+  if ($signature != "") then
+      print "@b("+$signature+")"
+      set signature = ""
+  endif
+  print "  @r(@b(<@i("+$sender+")@"+$fromhost+">))\n\n"
+  print $body
+  print $endmarker
+  put
+  exit
+
+# All done
+endcase
+

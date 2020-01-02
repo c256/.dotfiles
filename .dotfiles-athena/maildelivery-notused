@@ -1,0 +1,110 @@
+#  header    pattern   action    result    string
+
+to	help@akamai.com		folder	?	akamai-errors
+cc	help@akamai.com		folder	?	akamai-errors
+to	help@web-errors.com	folder	?	akamai-errors
+cc	help@web-errors.com	folder	?	akamai-errors
+
+# http state
+to	     http-state		folder	   ?	hack-httpstate
+cc	     http-state		folder	   ?	hack-httpstate
+
+# libwww
+to	     www-lib@w3.org	folder	   ?	hack-libwww
+cc	     www-lib@w3.org	folder	   ?	hack-libwww
+
+# apache
+to	     new-httpd	folder	   ?	    hack-apache     
+cc	     new-httpd	folder	   ?	    hack-apache     
+
+# cyrus
+to	     info-cyrus	folder	   ?	    hack-imap
+cc	     info-cyrus	folder	   ?	    hack-imap
+to	     imap@u	folder	   ?	    hack-imap
+cc	     imap@u	folder	   ?	    hack-imap
+
+
+# coda (dev only; announce goes to inbox)
+to	     codadev	folder	   ?	    hack-coda
+cc	     codadev	folder	   ?	    hack-coda
+
+# squid
+to 	     squid-users folder	   ?  	    hack-squid
+cc 	     squid-users folder	   ?  	    hack-squid
+
+# W3C stuff
+to	     xml-dev	folder	   ?	    w3c
+cc	     xml-dev	folder	   ?	    w3c
+to	     xml-uri	folder	   ?	    w3c
+cc	     xml-uri	folder	   ?	    w3c
+to	     www-xml-linking-comments	folder	   ?	    w3c
+cc	     www-xml-linking-comments	folder	   ?	    w3c
+
+
+# linux-kernel
+to 	     linux-kernel folder   ? 	    trash
+cc 	     linux-kernel folder   ? 	    trash
+
+# linux-net
+to 	     linux-net folder   ? 	    trash
+cc 	     linux-net folder   ? 	    trash
+
+# pilot-unix
+to 	     pilot-unix folder   ? 	    hack-pilot
+cc 	     pilot-unix folder   ? 	    hack-pilot
+
+# bugtraq
+to	     bugtraq	folder	 ?	    hack-bugtraq
+cc	     bugtraq	folder	 ?	    hack-bugtraq
+
+# ptk
+to 	     ptk@lists 	folder   ? 	    trash
+cc 	     ptk@lists 	folder   ? 	    trash
+
+# inn
+to 	     inn-workers folder   ? 	    hack-inn
+cc 	     inn-workers folder   ? 	    hack-inn
+
+# ADnD
+to           ADND-L      folder   ?         game-adnd
+cc           ADND-L      folder   ?         game-adnd
+
+# Master Tools discussion
+to           DNDMASTERTOOLS-L      folder   ?         game-mt
+cc           DNDMASTERTOOLS-L      folder   ?         game-mt
+
+
+# OGF
+to           ogf-l      folder   ?         game-ogf
+cc           ogf-l      folder   ?         game-ogf
+
+# B5
+to	b5ccglist@egroups.com	folder	?	game-b5ccg
+cc	b5ccglist@egroups.com	folder	?	game-b5ccg
+
+
+# handhelds
+to	@handhelds.org	folder	?	hack-handhelds
+cc	@handhelds.org	folder	?	hack-handhelds
+
+# misc reading
+from	     HumorPoetry		folder	?	collection
+from	     scout@CS			folder	? 	collection
+from	     margolis@			folder	? 	collection
+from	     brian@bizbot.net 		folder	?	collection
+from	     webmaster@uselessfacts.net	folder	?	collection
+
+# personal mail
+#to	     yandros	folder	   ?	    personal
+#cc	     yandros	folder	   ?	    personal
+#to	     y@mit	folder	   ?	    personal
+#cc	     y@mit	folder	   ?	    personal
+
+# final catch for Akamai mail
+to	@akamai.com	folder 	?	akamai
+cc	@akamai.com	folder 	?	akamai
+
+# default rule
+default	     - 		folder	   ?        inbox
+
+

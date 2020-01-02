@@ -1,0 +1,28 @@
+#!/bin/sh
+
+unlog
+
+nfsid -r -a
+
+echo -n "$KRBTKFILE, $KRB5CCNAME: "
+kdestroy
+KRBTKFILE=/tmp/tkt_yr;export KRBTKFILE
+KRB5CCNAME=/tmp/krb5cc_yr;export KRB5CCNAME
+echo -n "$KRBTKFILE, $KRB5CCNAME: "
+kdestroy
+KRBTKFILE=/tmp/tkt_y;export KRBTKFILE
+KRB5CCNAME=/tmp/krb5cc_y;export KRB5CCNAME
+echo -n "$KRBTKFILE, $KRB5CCNAME: "
+kdestroy
+KRBTKFILE=/tmp/tkt_ye;export KRBTKFILE
+KRB5CCNAME=/tmp/krb5cc_ye;export KRB5CCNAME
+echo -n "$KRBTKFILE, $KRB5CCNAME: "
+kdestroy
+KRBTKFILE=/tmp/tkt_yo;export KRBTKFILE
+KRB5CCNAME=/tmp/krb5cc_yo;export KRB5CCNAME
+echo -n "$KRBTKFILE, $KRB5CCNAME: "
+kdestroy
+KRBTKFILE=/tmp/tkt12264;export KRBTKFILE
+KRB5CCNAME=/tmp/krb5cc_12264;export KRB5CCNAME
+echo -n "$KRBTKFILE, $KRB5CCNAME: "
+kdestroy

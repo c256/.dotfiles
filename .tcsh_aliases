@@ -1,0 +1,45 @@
+# My aliases : yandros@mit.edu
+
+alias kat 'cat -e -v'
+alias cp 'cp -i'
+alias mv 'mv -i'
+alias j 'jobs -l'
+alias cd 'pushd'
+alias bd 'popd'
+alias l 'ls -lF'
+alias ll 'ls -laFg'
+alias clean 'rm -i ./*~ ./.*~'
+alias hc hide_console
+
+##
+## Kerberos ticket handling
+##
+#alias TKT     'setenv KRBTKFILE "\!*"'
+#alias TKT5    'setenv KRB5CCNAME "\!*"'
+#alias tkt     'printenv KRBTKFILE'
+#alias tkt5    'printenv KRB5CCNAME'
+#alias knull   'TKT /tmp/tkt_y; TKT5 /tmp/krb5cc_y'
+#alias kroot   'TKT /tmp/tkt_yr; TKT5 /tmp/krb5cc_yr'
+#alias kextra  'TKT /tmp/tkt_ye; TKT5 /tmp/krb5cc_ye'
+#alias kother  'TKT /tmp/tkt_yo; TKT5 /tmp/krb5cc_yo'
+#alias kfoo    'TKT /tmp/tkt_foo; TKT5 /tmp/krb5cc_foo'
+#alias mvknull 'mv $KRBTKFILE /tmp/tkt_y; mv /tmp/`basename $KRB5CCNAME` /tmp/krb5cc_y; knull'
+
+##
+## Zephyr aliases
+##
+#alias z 'zwrite -n'
+#alias zi 'z -q -d -i'
+#alias zc 'z -q -d -c'
+#alias zl zlocate
+#alias zn 'znol on \!* | sendme'
+#alias zwm 'zi White-Magic'
+#alias zsipb 'zi sipb -s "<\\!shabby>"'
+#alias ztest 'zi Test -m "*meep*" ; z yandros -m "*meep*"'
+#alias zhelp 'zi help '
+#alias zhelp.d 'zi help.d'
+#
+#alias zcc 'zc Consult -s "Chad"'
+#alias zbs 'zc Blood -i Souls'
+#alias zcl 'zc legends -s "chad"'
+

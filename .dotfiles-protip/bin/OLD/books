@@ -1,0 +1,28 @@
+#!/usr/bin/perl -w
+
+# read in stdin
+#  assuming we got something interesting, append it to collection
+#  terminate collection
+$collection=$ENV{'HOME'}."/www/ToDo/books.txt";
+
+undef $/;  # slurp in all of stdin
+$input = <>;
+
+if ($input =~ /^\s+$/) { # all whitespace
+    print "Found no input.\n";
+    exit(0);
+}
+
+open (COLLECTION, ">> $collection") || 
+    die "Couldn't open collection $collection";
+
+print COLLECTION $input;
+print COLLECTION 
+    "\n;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\n\n";
+
+close(COLLECTION) || die "Error closing collection";
+
+
+
+
+

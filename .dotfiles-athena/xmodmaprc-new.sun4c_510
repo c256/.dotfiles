@@ -1,0 +1,14 @@
+! switch a few things around
+keysym Escape = grave asciitilde
+keycode 125 = Escape
+keysym grave = Delete
+
+!sun keyboards reverse Caps_Lock and Control
+! move control into the corner; make caps_lock the windowmanager key
+clear Lock
+keycode 231 = Hyper_L
+keycode 64 = Control_L
+add mod5 = Hyper_L
+remove control = Hyper_L
+add control = Control_L
+

@@ -1,0 +1,5 @@
+autodetach on
+escape ^T^T
+nethack on
+startup_message off
+screen 0

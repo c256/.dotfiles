@@ -1,0 +1,57 @@
+# Tcsh 6 Initialization File
+#
+# Chad Brown
+# <yandros@Athena.MIT.EDU>
+#
+
+# set path for CVS
+set path = ($path /afs/athena.mit.edu/project/gnu/gbin)
+
+set prompt = "%U%n@%m%u:%~\n%# "
+#funky prompt games
+#set prompt = "%# "
+#set rprompt = "%U%m%u:%~"
+
+set hosttype = $HOSTTYPE
+set bindir = ${hosttype}bin
+set host = `hostname`
+
+set prompt2 = ";;; "
+set prompt3 = "[%R>"
+set promptchars = ";#"
+set history = 150
+set savehist = ($history merge)
+set ignoreeof  
+unset autologout
+set hosttype = $HOSTTYPE
+set lineditmin = 4
+set fignore = (~)
+if ($host != "multics.mit.edu") then 
+	set watch = ( any any )
+endif
+set autoexpand
+set autolist
+set histlist 
+set dextract
+set pushdtohome
+set pushdsilent
+set visiblebell
+set listjobs=long
+set ignore_symlinks
+set showdots
+set matchbeep = notunique
+set listmax = 150
+set rmstar
+set wordchars = "[]~="
+unset autologout savedirs
+
+bindkey " "  magic-space
+bindkey "^s" i-search-fwd
+bindkey "^r" i-search-back
+
+source ~/.aliases			# aliases
+############ Sigh.  I gave in to studly-completion ############
+complete setenv 'p/1/e/' 'c/*:/d/'
+complete jobTypeIs 'p/1/(hack tool dcns black sipb default inf min)/'
+complete -jo\* 'p/0/(jobTypeIs)/'
+complete timecard 'p/1/(-in -out)/'

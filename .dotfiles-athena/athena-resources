@@ -1,0 +1,295 @@
+! My X resource file
+! 
+! Chad Brown
+! <yandros@MIT.EDU>
+!
+
+! default resources
+*ovalButton:			True
+
+! some default xterm stuff
+XTerm*scrollBar:		False
+XTerm*saveLines:		350
+XTerm*ReverseWrap:		on
+XTerm*jumpScroll:		on
+XTerm*visualBell:		on
+XTerm*borderWidth:		0
+XTerm*pointerShape:		hand2
+XTerm*logFile: 		    	/tmp/._yxterm.log
+!XTerm*font:		-adobe-courier-medium-r-normal--12-*-*-*-m-*-*-*
+!-*-lucidatypewriter-medium-r-*-*-14-100-*-*-m-*-iso8859-1
+#if SERVER_oliver
+XTerm*font: fixed
+#else
+XTerm*font:		-*-lucidatypewriter-medium-*-*-*-10-*-*-*-m-*-*-*
+#endif
+XTerm*scrollbar*thickness: 	7
+XTerm*teksmall:			true
+XTerm*scrollTtyOutput:		false
+XTerm*ttyModes:			erase ^?
+XTerm*eightBitInput:		false
+XTerm*VT100.geometry:		80x25
+! doesn't work right...
+XTerm*fontmenu.font3.label:	Lucida12
+XTerm*font3:		-*-lucidatypewriter-medium-*-*-*-12-*-*-*-m-*-*-*
+XTerm*fontmenu.font4.label:	Lucida14
+XTerm*font4:		-*-lucidatypewriter-medium-*-*-*-14-*-*-*-m-*-*-*
+XTerm*VT100.translations: #override \
+	~Ctrl ~Meta Shift <Btn2Up>:insert-selection(PRIMARY, CUT_BUFFER0) \n\
+	~Ctrl ~Meta <Btn2Up>:ignore() \n\
+	~Meta	<Key>BackSpace:	string(\177) \n\
+	Meta	<Key>BackSpace:	string(\033\177) \n\
+
+
+Silmaril*VT100.geometry:	82x65+7+5
+Orb*VT100.geometry:	    	82x65+507+5
+
+! default emacs stuff
+Emacs*font:		-*-lucidatypewriter-medium-*-*-*-10-*-*-*-m-*-*-*
+Palantiri.geometry: 		80x63+508+6
+MiniBuffer.geometry:  	    	-17-10
+Palantiri*borderWidth:		0
+MiniBuffer*borderWidth:		0
+
+!some zwgc stuff
+zwgc*borderwidth:		4
+zwgc*reverseStack:		True
+zwgc*cursorCode:		58
+zwgc*MinTimeToLive: 		700
+zwgc*iconName: 			Z
+zwgc*enableDelete:              True
+zwgc*Transient:			True
+
+! Hahahahahaha!!!!
+Mwm*showFeedback: all -kill -restart -quit
+
+! fix a few problems with reverse video
+Fig*reverseVideo:		True
+Bitmap*reverseVideo: 		off
+XV*reverseVideo: 		off
+
+! console settings
+console*iconWindow.geometry: 	16x16+c+c
+console*window.geometry:	484x113-28-84
+console*frequency: 		500
+console*icon.icon: 		/mit/yandros/graphics/smallterm.xbm
+console*icon.ReverseVideo:	True
+console*Arrow.width:            8
+console*Arrow.height:           8
+console*scrollBar.width:        10
+console*form.form:		hide: 		    100 0 - -		      \
+				scrollup: 	    0 0 - -		      \
+				scrolldown: 	    0 - - 100		      \
+				scrollBarWindow:    0 scrollup - scrolldown   \
+				textDisplayWindow:  scrollBarWindow 0 100 100 \
+				title: 		    100 0 110 textDisplayWindow
+
+
+! XScreensaver stuff
+XScreensaver*passwordPort:  	37777
+XScreensaver*useBackground: 	True
+XScreensaver*lockCommand: 	/mit/yandros/bin/destroy
+XScreensaver*logoutCommand:     /mit/yandros/bin/end_session.sh -force
+XScreensaver*icon.bitmap: 	/mit/yandros/graphics/pentagram.xbm
+XScreensaver*float.bitmap: 	/mit/yandros/graphics/sevenc.xbm
+XScreensaver*float.BorderWidth: 0
+XScreensaver*BorderWidth: 	0
+XScreensaver.geometry:	    	24x31+111-5
+! Hack
+XScreensaver.menu*geometry: 	+17+17
+XScreensaver*velocity: 		50
+XScreensaver*displayElapsed: 	False
+XScreensaver*displayTime: 	False
+XScreensaver*displayTimeout: 	False
+XScreensaver*autoLock: 		True
+XScreensaver*font:	-adobe-times-bold-i-normal--12-120-75-75-p-68-iso8859-1
+XScreensaver*logoutButtonTimeout:	5
+
+
+! xload settings
+XLoad*jumpscroll:		1
+XLoad*geometry: 		100x29+213-5
+XLoad*Label.font:		5x8
+
+
+! xcalc settings
+XCalc.rpn:			True
+XCalc.stipple:			True
+
+
+! xdvi settings
+!XDvi.reverseVideo: 		off
+XDvi.expert: 			true
+
+
+! xwais settings
+Xwais*font: 	    	    	6x10
+Xwais*questionDirectory:        /mit/yandros/.Private/wais/questions/
+Xwais*userSourceDirectory:      /mit/yandros/.Private/wais/sources/
+Xwais*documentDirectory:      	/mit/yandros/tmp/
+Xwaisq*questionDirectory:       /mit/yandros/.Private/wais/questions/
+Xwaisq*userSourceDirectory:     /mit/yandros/.Private/wais/sources/
+Xwaisq*documentDirectory:      	/mit/yandros/tmp/
+
+
+! FrameMaker settings
+Maker*focusOnMouse:   	    	True
+Maker.textStippleFilled:        False
+Maker*geometry: 		245x25
+
+
+! Editres settings
+Editres*reverseVideo:		on
+
+
+! Mosaic settings
+Mosaic*defaultHotlistFile:		/www/mosaic-hotlist
+Mosaic*documentsMenuSpecfile:		/mit/yandros/www/doc_menu
+Mosaic*globalHistoryFile:		/www/mosaic-history
+Mosaic*personalAnnotationDirectory: 	/www/mosaic-annotations
+!Mosaic*trackFullURLs:			false
+Mosaic*useGlobalHistory:		false
+Mosaic*colorsPerInlinedImage:		70
+
+
+! netscape bug
+Netscape*keyboardFocusPolicy: pointer
+Netscape*welcomeURL:  file://localhost/mit/yandros/www/home.html
+Netscape*blinkingEnabled:  True
+Netscape*busyBlinkRate:    100
+
+! zwgc formatting stuff
+Zwgc*geometry: 					+1+1
+Zwgc.style*wg_ctl_class*geometry:		+c+c
+Zwgc.style.message.personal*geometry: 		-1-1
+Zwgc.style.personal*geometry:	    	    	-1-1
+Zwgc.style.message.weather*geometry: 		-1+c
+Zwgc.style.message.urgent.personal.geometry: 	+c+c
+Zwgc.style.message.help*geometry: 		+1-1
+Zwgc.style.message.help_d*geometry: 		+1-1
+Zwgc.style.message.sipb*geometry: 		+c-1
+Zwgc.style.message.sipb_d*geometry: 		+c-1
+Zwgc.style.message.consult*geometry: 		+1-1
+Zwgc.style.message.consult_d*geometry: 		+1-1
+Zwgc.style.message.network*geometry: 		+1-1
+Zwgc.style.message.network_d*geometry: 		+1-1
+Zwgc.style.message.watchmaker*geometry: 	+1-1
+Zwgc.style.message.watchmaker_d*geometry: 	+1-1
+Zwgc.style.message.perl*geometry:		+1-1
+Zwgc.style.message.perl_d*geometry:		+1-1
+Zwgc.style.login*geometry: 			-17-200
+Zwgc.style.sendme*geometry: 	 		-1+c
+Zwgc.style.configure*geometry:	 		+c+c
+Zwgc.style.consult*geometry:			-1+1
+Zwgc.style.consult_d*geometry:			-1+1
+Zwgc.style.blood*geometry:			-1+1
+Zwgc.style.sipb*geometry:   	    	    	+c-1
+Zwgc.style.zone-cell*geometry:      	    	-1+1
+
+Zwgc*fontfamily.symbols.small.Face: 	-adobe-symbol-medium-r-normal--8-80-75-75-p-51-*-
+Zwgc*fontfamily.symbols.medium.Face: 	-adobe-symbol-medium-r-normal--14-140-75-75-p-85-*-
+Zwgc*fontfamily.symbols.large.Face: 	-adobe-symbol-medium-r-normal--20-140-100-100-p-107-*-
+Zwgc*fontfamily.hugesymbols.Size.Face:	-adobe-symbol-medium-r-normal--34-240-100-100-p-191-*-
+
+! from Shabby
+Zwgc*fontfamily.tiny*roman:             *adobe-times-medium-r-*-80-*-p-*
+Zwgc*fontfamily.tiny*bold:              *adobe-times-bold-r-*-80-*-p-*
+Zwgc*fontfamily.tiny*italic:            *adobe-times-medium-i-*-80-*-p-*
+Zwgc*fontfamily.tiny*bolditalic:        *adobe-times-bold-i-*-80-*-p-*
+
+
+! Gratuitous?  Yes, thank you...
+xzewd-sender.visible: 		False
+xzewd-list.columnHeight: 	1
+xzewd-list*resizeStyle: 	vtwm
+xzewd-list*geometry: 		+10-10
+xzewd-list.periodicCheck:	10
+xzewd-list*fontList: 		-*-helvetica-medium-r-*--10-*
+xzewd-list*background: 		black
+xzewd-list*foreground: 		SpringGreen
+xzewd-sender*foreground: 	gray20
+xzewd-sender*background: 	gray70
+
+
+
+
+! For SimConsole mode :-)
+Black*borderColor:		Black
+Black*font:			9x15
+Black.geometry:			80x25+10+10
+Black*VT100.geometry:		80x25+10+10
+
+
+! color-monitor-specific setup  (4-bitplane heads suck)
+#if defined(COLOR) && PLANES != 4
+
+XTerm*foreground: 		NavajoWhite
+XTerm*background: 		Black
+XTerm*BorderColor:		SteelBlue
+XTerm*cursorColor: 		DeepSkyBlue
+XTerm*pointerColor:		DeepSkyBlue
+XTerm*scrollbar*foreground: 	DeepSkyBlue
+rxvt*foreground: 		NavajoWhite
+rxvt*background: 		Black
+Emacs*background: 		Black
+Emacs*foreground: 		DeepSkyBlue
+Emacs*borderColor:		SteelBlue
+Emacs*cursorColor: 		NavajoWhite
+Emacs*pointerColor: 		NavajoWhite
+Zwgc.style.blue*foreground:		DeepSkyBlue
+Zwgc.style.blue*borderColor:		DeepSkyBlue
+Zwgc.style.login.*foreground: 		DeepSkyBlue
+Zwgc.style.login.*borderColor: 		DeepSkyBlue
+Zwgc.style.consult*foreground: 		NavajoWhite
+Zwgc.style.consult*borderColor: 	NavajoWhite
+Zwgc.style.zone*foreground: 		NavajoWhite
+Zwgc.style.zone*borderColor: 		NavajoWhite
+Zwgc.style.message.personal*foreground: NavajoWhite
+Zwgc.style.message.personal*borderColor:NavajoWhite
+Zwgc.style.sendme.*foreground: 		NavajoWhite
+Zwgc.style.sendme.*borderColor: 	NavajoWhite
+Zwgc.style.message.weather*foreground:	NavajoWhite
+Zwgc.style.message.weather*borderColor:	NavajoWhite
+Zwgc*foreground: 			LightSteelBlue
+Zwgc*borderColor: 		SteelBlue
+Zwgc*background:    		Black
+XScreensaver*foreground: 	LightSteelBlue
+XScreensaver*background: 	Black
+xscreensaver*BorderColor:	SteelBlue
+DClock*Foreground: 		LightSteelBlue
+DClock*Background: 		Black
+DClock*borderColor: 		SteelBlue
+XClock*Foreground: 		SpringGreen
+XClock*Background: 		Black
+XClock*borderColor: 		Black
+Console*reverseVideo: 		False
+Console*background: 		Black
+Console*foreground: 		PaleGoldenRod
+Console*borderColor: 		PaleGoldenRod
+XLoad*foreground: 		Orange
+XLoad*background:	 	Black
+XLoad*highlight: 		SteelBlue
+XLoad*borderColor: 		SteelBlue
+Xarchie*Foreground:	NavajoWhite
+Xarchie*Background:	Black
+XCal*Forground:		SpringGreen
+XCal*Background:	Black
+Calendar*Foreground:	#99b0ff
+Calendar*Background:	Black
+NetProb*Foreground:	#99b0ff
+NetProb*Background:	Black
+
+!#endif
+!#if GRAYSCALE
+!#if MONOCHROME
+! comment out until I get a grayscale section
+#else
+
+*reverseVideo:   	    	True
+XLoad*foreground: 		White
+XLoad*background: 		Black
+XLoad*borderColor: 		White
+#endif
+
+#include "/mit/yandros/.Private/resources"
+

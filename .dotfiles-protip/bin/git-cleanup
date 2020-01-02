@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# clean up brew installation (can take a long time)
+echo "Homebrew"
+brew update
+brew doctor
+
+# refresh projects
+for prj in `cat /usr/local/src/.git-get-list`
+do 
+	cd $prj
+	/bin/echo ----------------------------------
+	/bin/echo -n `basename $PWD`": "
+	git gc --prune=now
+done
+
+speak "cleanup complete"
+

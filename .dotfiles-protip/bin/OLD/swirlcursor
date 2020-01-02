@@ -1,0 +1,3 @@
+#!/bin/sh -
+
+xsetroot -cursor $HOME/graphics/cursors/swirl.cursor.xbm $HOME/graphics/cursors/swirl.mask.xbm

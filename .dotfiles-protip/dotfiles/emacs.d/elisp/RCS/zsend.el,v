@@ -1,0 +1,275 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@; @;
+
+
+1.1
+date	2009.02.04.20.57.05;	author chadp;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@;; zsend.el
+;; Marc Horowitz <marc@@mit.edu>
+;; based on a zsend.el by Mark Eichin <eichin@@mit.edu>
+;;
+;; $Id: zsend.el,v 1.15 1995/08/03 00:35:14 marc Exp $
+
+;; Create association lists for people and instances
+(defvar zsend-user-list '(()))
+(defvar zsend-instance-list '(()))
+(defvar zsend-class-list '(()))
+(defvar zsend-tuple-list '(()))
+
+;; Holds previous recipient
+(defvar zsend-last-user "")
+(defvar zsend-last-instance "")
+(defvar zsend-last-class "")
+(defvar zsend-last-tuple "")
+
+(defvar zsend-zwrite "/usr/athena/bin/zwrite"
+  "path to zwrite executeable")
+
+(defvar zsend-zwrite-args '("-l" "-n")
+  "list containing arguments to zwrite")
+
+(defvar zsend-tuple-separator ","
+  "regexp separating class, instance, recipient tuple")
+
+(defmacro zsend-pick (type u i c tu)
+  (` (cond ((eq (, type) 'user) (, u))
+	   ((eq (, type) 'instance) (, i))
+	   ((eq (, type) 'class) (, c))
+	   ((eq (, type) 'tuple) (, tu)))))
+
+(defun zsend-typestr (type)
+  (zsend-pick type "user" "instance" "class" "tuple"))
+
+(defun zsend-get-dest (type)
+  (let* ((def (zsend-pick type
+			  zsend-last-user
+			  zsend-last-instance
+			  zsend-last-class
+			  zsend-last-tuple))
+	 (list (zsend-pick type
+			   zsend-user-list
+			   zsend-instance-list
+			   zsend-class-list
+			   zsend-tuple-list))
+	 (dest
+	  (completing-read (concat "Destination " (zsend-typestr type) ": "
+				   (if (not (equal def ""))
+				       (concat "(default " def ") ")))
+			   list
+			   nil
+			   nil)))
+    (cond ((not (equal dest "")) dest)
+	  ((equal def "") (error "zsend: no default"))
+	  (t def))))
+
+(defun zsend-deststr (dest)
+  (if (eq 'tuple (car dest))
+      (concat "<" (zsend-tuplestr dest) ">")
+    (concat (zsend-typestr (car dest)) " " (cdr dest))))
+
+;; hack mostly for my zlogger
+
+(defun zsend-tuplestr (dest)
+  (zsend-pick (car dest)
+	      (concat "message,personal," (cdr dest))
+	      (concat "message," (cdr dest) ",*")
+	      (concat (cdr dest) ",personal,*")
+	      (let* ((dlist (zsend-tuple-list dest))
+		     (dclass (nth 0 dlist))
+		     (dinst (nth 1 dlist))
+		     (drecip (nth 2 dlist)))
+		(concat (or dclass "message") zsend-tuple-separator
+			(or dinst "personal") zsend-tuple-separator
+			(or drecip "*")))))
+
+(defun zsend-tuple-list (dest)
+  (zsend-pick (car dest)
+	      (list nil nil (cdr dest))
+	      (list nil (cdr dest) nil)
+	      (list (cdr dest) nil nil)
+	      (let (dclass dinstrecip dinst drecip)
+		(if (not zsend-tuple-separator)
+		    (setq dclass (cdr dest))
+		  ;; if there's a separator present...
+		  (if (string-match zsend-tuple-separator (cdr dest))
+		      ;; put the lhs in dclass, and the rest in dinstrecip
+		      (setq dclass (substring (cdr dest) 0 (match-beginning 0))
+			    dinstrecip (substring (cdr dest) (match-end 0)))
+		    ;; else put the lhs class in class, leave dinstrecip unset
+		    (setq dclass (cdr dest)))
+		  (if dinstrecip
+		      (progn
+			;; if there was an rhs above with a separator in it...
+			(if (string-match zsend-tuple-separator dinstrecip)
+			    ;; store the instance and recipient
+			    (setq dinst (substring dinstrecip 0
+						   (match-beginning 0))
+				  drecip (substring dinstrecip (match-end 0)))
+			  ;; if there was an rhs with no separator, treat the
+			  ;; rhs as the instance
+			  (setq dinst dinstrecip)))))
+		(if (string-equal dclass "")
+		    (setq dclass nil))
+		(if (string-equal dinst "")
+		    (setq dinst nil))
+		(if (string-equal drecip "")
+		    (setq drecip nil))
+		(if (not (or dclass dinst drecip))
+		    (error "You must specify at least one tuple part"))
+		(list dclass dinst drecip))))
+
+(defun zsend-get-msg (dest) 
+  (read-input (concat "Msg to " (zsend-deststr dest) ": ")))
+
+(defun zsend-prefix-to-type (prefix)
+  (cond
+   ((equal current-prefix-arg '(16)) 'tuple)
+   (current-prefix-arg 'instance)
+   (t 'user)))
+
+(defun zsend-region (destination)
+  "Acts like, but uses the region in the current buffer as
+the message."
+  (interactive
+   (let ((type (zsend-prefix-to-type current-prefix-arg)))
+     (list (cons type (zsend-get-dest type)))))
+  (zsend destination (buffer-substring (point) (mark))))
+
+(defun zsend (destination &optional message)
+  "Send zephyrgrams from emacs.
+
+Usernames, instance names, or tuple names can be typed in, or
+completion will occur on previously used destinations.
+
+        \\[zsend] will prompt for a username
+    C-u \\[zsend] will prompt for an instance
+C-u C-u \\[zsend] will prompt for a tuple
+
+A tuple is specified as ``class,instance,recipient''.  The separator
+is a regexp stored in zsend-tuple-separator which defaults to ``,''.
+If it set to nil, then no separation is attempted, and the entire
+string will be used as a class name.
+
+If a null messages is entered, a buffer will pop up in which to enter
+the text of the message.  C-c C-c to close the buffer and send the message.
+
+See the help for zsend-mode for more details."
+  (interactive
+   (let* ((type (zsend-prefix-to-type current-prefix-arg))
+	  (dest (cons type (zsend-get-dest type)))
+	  (msg (zsend-get-msg dest)))
+     (list dest msg)))
+
+  (if (not message) (setq message (zsend-get-msg destination)))
+
+  (let* ((cwc (current-window-configuration))
+	 (tempbuf (generate-new-buffer (concat " *zsend "
+					       (zsend-deststr destination)
+					       "*"))))
+    (switch-to-buffer-other-window tempbuf)
+    (zsend-mode destination cwc)
+    (if (not (equal message ""))
+	(progn (insert message)
+	       (zsend-send-zgram)))))
+
+(defun zsend-mode (dest cwc)
+  "Mode for composing and sending a zephyrgram.
+
+There are three hooks in this mode:
+
+zsend-mode-hook			Normal hook, run when buffer is set up
+zsend-before-zwrite-hook	Hooks run before zwrite is run.  The text of
+				the zgram is in the current buffer, the
+				destination can be found in the buffer-local
+				variable zsend-dest.
+zsend-after-zwrite-hook		Hooks run after zwrite is run.  Whatever
+				output printed by zwrite is in in the
+				current buffer, the destination can be
+				found in the buffer-local variable
+				zsend-dest.
+\\{zsend-mode-map}"
+  (interactive)
+  (kill-all-local-variables)
+  (erase-buffer)
+  (make-local-variable 'zsend-dest)
+  (setq zsend-dest dest)
+  (make-local-variable 'zsend-cwc)
+  (setq zsend-cwc cwc)
+  (setq major-mode 'zsend-mode)
+  (setq mode-name "ZSend")
+  (use-local-map zsend-mode-map)
+  (run-hooks 'zsend-mode-hook))
+
+(defun zsend-add-to-list (dest)
+  (let* ((type (car dest))
+	 (list (zsend-pick type
+			   'zsend-user-list
+			   'zsend-instance-list
+			   'zsend-class-list
+			   'zsend-tuple-list)))
+    (if (not (assoc (cdr dest) (eval list)))
+	(set list (cons (cons (cdr dest) nil) (eval list))))))
+
+(defun zsend-set-last (dest)
+  (set (zsend-pick (car dest)	
+		   'zsend-last-user
+		   'zsend-last-instance
+		   'zsend-last-class
+		   'zsend-last-tuple)
+       (cdr dest)))
+
+(defun zsend-send-zgram ()
+  (interactive)
+  (zsend-add-to-list zsend-dest)
+  (zsend-set-last zsend-dest)
+  (run-hooks 'zsend-before-zwrite-hook)
+  (zwrite zsend-dest)
+  (run-hooks 'zsend-after-zwrite-hook)
+  (zsend-cancel))
+
+(defun zwrite (dest)
+  (let* ((dlist (zsend-tuple-list dest))
+	 (dclass (nth 0 dlist))
+	 (dinst (nth 1 dlist))
+	 (drecip (nth 2 dlist))
+	 (default-directory "/"))
+    (apply 'call-process-region 
+	   (append (list (point-min) (point-max)
+			 zsend-zwrite t t nil)
+		   zsend-zwrite-args
+		   (and dclass (list "-c" dclass))
+		   (and dinst (list "-i" dinst))
+		   (and drecip (list drecip)))))
+; The 1- is to get rid of the ^J at the end of the message from zwgc.
+  (if (not (equal (point-max) 1))
+      (message (buffer-substring (point-min) (1- (point-max))))))
+
+(defun zsend-cancel ()
+  (interactive)
+  (let ((cwc zsend-cwc))
+    (kill-buffer (current-buffer))
+    (set-window-configuration cwc)))
+
+(defvar zsend-mode-map nil)
+(if zsend-mode-map
+    nil
+  (setq zsend-mode-map (make-keymap))
+  (define-key zsend-mode-map "\C-c\C-c" 'zsend-send-zgram)
+  (define-key zsend-mode-map "\C-c\C-q" 'zsend-cancel))
+@

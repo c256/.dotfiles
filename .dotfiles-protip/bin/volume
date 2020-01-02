@@ -1,0 +1,14 @@
+#!/bin/sh
+
+if test $# -gt 1; then
+	echo "Usage: volume [1-100]"
+	exit 1
+fi
+
+if test $1; then
+	/usr/bin/osascript -e "set volume output volume $1"
+else
+	/usr/bin/osascript -e "get output volume of (get volume settings)"
+fi
+
+

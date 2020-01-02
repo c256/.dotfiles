@@ -1,0 +1,168 @@
+# Try out twm.  could be fun.
+
+MenuFont      	"-adobe-times-bold-i-normal--12-120-*-*-*-*-*-*"
+IconFont      	"-adobe-helvetica-bold-r-normal--12-120-*-*-*-*-*-*"
+IconManagerFont	"-schumacher-clean-bold-r-normal--10-*-*-*-*-*-*-*"
+ResizeFont    	"-b&h-lucidabright-medium-r-*-*-20-*-*-*-*-*-*-*"
+IconManagerFont "-adobe-helvetica-bold-r-normal--*-100-*-*-*"
+
+AutoRelativeResize
+# seems to DBT with zephyr
+#AutoFocusToTransients
+BorderWidth 1
+DontMoveOff
+IconifyByUnmapping
+InterpolateMenuColors
+RestartPreviousState
+#StartInMapState
+MaxWindowSize "2000x2000"
+MoveDelta 3
+NoDefaults
+NoHighlight { 
+	"xscreensaver" "fclock" "XLoad" "Virtual Desktop" "XClock" "XApm" }
+NoGrabServer
+NoIconManagers
+NoMenuShadows
+NoRaiseOnMove
+NoRaiseOnResize
+NoTitle
+MakeTitle { "Netscape" "Navigator" "Gimp" }
+WarpUnmapped
+WindowRing { "NXTerm" "XTerm" "RightEmacs" "LeftEmacs"}
+#XMoveGrid 515
+#YMoveGrid 8
+XorValue 88
+Zoom 0
+
+SaveColor {
+	"black"
+	"deep sky blue"
+	"steel blue"
+	"NavajoWhite"
+	"BlueViolet"
+	"SpringGreen"
+	"PaleGoldenRod"
+	"Orange"
+	"Light Steel Blue"
+}
+
+Color
+{
+  DefaultBackground 	    "black"
+  DefaultForeground 	    "deep sky blue"
+
+  BorderTileBackground      "SteelBlue" { "xscreensaver" "Black"
+	                                   "fclock" "Black"
+	                                   "Clock" "Black"
+                                           "XLoad" "Black"
+                                           "XClock" "Black"
+                                           "XApm" "Black"
+                                           "TWM Icon Manager" "Black"
+                                           "Virtual Desktop" "Black"  }
+
+  BorderTileForeground      "SteelBlue" { "xscreensaver" "Black"
+	                                   "fclock" "Black"
+	                                   "Clock" "Black"
+                                           "XLoad" "Black"
+                                           "XClock" "Black"
+                                           "XApm" "Black"
+                                           "TWM Icon Manager" "Black"
+                                           "Virtual Desktop" "Black"  }
+  BorderColor 		    "DeepSkyBlue"  { "xscreensaver" "Black"
+	                                   "fclock" "Black"
+	                                   "Clock" "Black"
+                                           "XLoad" "Black"
+                                           "XClock" "Black"
+                                           "XApm" "Black"
+                                           "TWM Icon Manager" "Black"
+                                           "Virtual Desktop" "Black"  }
+
+  TitleBackground   	    "black"
+  TitleForeground   	    "NavajoWhite"
+  MenuBackground    	    "Black"
+  MenuForeground    	    "LightSlateGray"
+  MenuTitleBackground       "Black"
+  MenuTitleForeground       "SteelBlue"
+  IconBackground    	    "SlateGray"
+  IconBorderColor   	    "MidnightBlue"
+  IconForeground    	    "DeepSkyBlue"
+  IconManagerBackground     "Black"
+  IconManagerForeground     "SteelBlue"
+  IconManagerHighlight      "DeepSkyBlue"
+}
+
+#
+# Define some useful functions for motion-based actions.
+#
+Function "move-or-lower"      { f.forcemove f.deltastop f.lower }
+Function "move-or-raise"      { f.forcemove f.deltastop f.raise }
+Function "move-or-raiselower" { f.forcemove f.deltastop f.raiselower }
+Function "move-or-iconify"    { f.forcemove f.deltastop f.iconify }
+
+#
+# Set some useful bindings.  Sort of uwm-ish, sort of simple-button-ish
+#
+Button1 =	: root		: f.menu "WM"
+Button2 =       : root		: f.menu "TwmAllWindows"
+Button3 =       : root		: f.menu "#!"
+Button3 = m5    : root          : f.menu "TwmAllWindows"
+
+Button1 = m5	: window|icon	: f.raiselower
+Button2 = m5	: window|icon	: f.resize
+Button3 = m5	: window|icon	: f.forcemove
+
+Button1 =	: title		: f.function "move-or-raiselower"
+Button2 =	: title		: f.forcemove
+Button3 =	: title		: f.forcemove
+
+Button1 =	: icon		: f.iconify
+Button2 =	: icon		: f.iconify
+Button3 =	: icon		: f.function "move-or-iconify"
+
+Button1 =	: iconmgr	: f.iconify
+Button2 =	: iconmgr	: f.warpto ""
+
+"Down"  = m5	: all		: f.lower
+"Up"    = m5	: all	        : f.raise
+
+# Function Keys
+"F1"    =         : all             : f.warpring "next"
+"F5"    =         : all             : f.warpring "next"
+"F5"    = m5      : all             : f.warpring "next"
+"F4"    = m       : w               : f.delete
+"F4"    = m5      : w               : f.delete
+"F12"   = c|m5    : all             : f.restart
+
+"F1"    = c|m5    : all             : f.menu "WM"
+"F2"    = c|m5    : all             : f.menu "TwmAllWindows"
+"F3"    = c|m5    : all             : f.menu "#!"
+
+# Menus
+
+menu "WM"
+{
+"*WM"		f.title
+"Icon"		f.iconify
+"Size"		f.resize
+"Move"		f.forcemove
+"Down"		f.lower
+"Wipe"		f.refresh
+"Id"		f.identify
+".rc"		f.restart
+"Del"		f.delete
+"Kill"		f.destroy
+}
+
+menu "#!"
+{
+"*#!"		f.title
+"emacs"		!"emacs -name RightEmacs &"
+"left"		!"xterm -name LeftTerm &"
+"right"		!"xterm -name RightTerm &"
+"web"	        !"netscape &"
+"load"		!"xload &"
+"clock"		!"xclock &"
+"mag"		!"xmag &"
+"xrdb"		!"xrdb /mit/yandros/.Xresources &"
+"lock"		!"xlock &"
+}

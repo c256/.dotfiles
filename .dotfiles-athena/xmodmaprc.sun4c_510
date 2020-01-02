@@ -1,0 +1,17 @@
+! sun4u (sun blade) keyboards
+! switch a few things around
+keysym Escape = grave asciitilde
+keysym F13 = Escape
+keysym grave = Delete
+
+!replace capslock with Mod5 (windowmanager key)
+clear Lock
+keysym Caps_Lock = Hyper_L
+add mod5 = Hyper_L
+
+!keycode 64 (keysym 0xffe5, Caps_Lock
+!keycode 233 (keysym 0xffe9, Alt_L)
+!keycode 234 (keysym 0xffe7, Meta_L)
+!keycode 238 (keysym 0xffe8, Meta_R)
+!keycode 108 (keysym 0xff20, Multi_key)
+!keycode 237 (keysym 0xff7e, Mode_switch)

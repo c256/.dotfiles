@@ -1,0 +1,6 @@
+#  header    pattern   action    result    string
+
+# default rule
+default	     - 		folder	   ?        inbox
+
+

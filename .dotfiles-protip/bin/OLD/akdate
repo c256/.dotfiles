@@ -1,0 +1,49 @@
+#!/usr/bin/perl
+# from jlwfnord
+
+open(RDR, "/bin/date|");
+while (<RDR>) {
+    @blah = split;
+}
+$akyear = $blah[5] - 400;
+if ($blah[1] eq "Jan") {
+    $akcyc = "Ice";
+    $akmon = "0";
+} elsif ($blah[1] eq "Feb") {
+    $akcyc = "Ice";
+    $akmon = "31";
+} elsif ($blah[1] eq "Mar") {
+    $akcyc = "Wind";
+    $akmon = "0";
+} elsif ($blah[1] eq "Apr") {
+    $akcyc = "Wind";
+    $akmon = "31";
+} elsif ($blah[1] eq "May") {
+    $akcyc = "Earth";
+    $akmon = "0";
+} elsif ($blah[1] eq "Jun") {
+    $akcyc = "Earth";
+    $akmon = "31";
+} elsif ($blah[1] eq "Jul") {
+    $akcyc = "Fire";
+    $akmon = "0";
+} elsif ($blah[1] eq "Aug") {
+    $akcyc = "Fire";
+    $akmon = "31";
+} elsif ($blah[1] eq "Sep") {
+    $akcyc = "Ash";
+    $akmon = "0";
+} elsif ($blah[1] eq "Oct") {
+    $akcyc = "Ash";
+    $akmon = "30";
+} elsif ($blah[1] eq "Nov") {
+    $akcyc = "Phoenix";
+    $akmon = "0";
+} elsif ($blah[1] eq "Dec") {
+    $akcyc = "Phoenix";
+    $akmon = "30";
+} else {
+    die "Wacky month!\n";
+}
+$akmon = $akmon + $blah[2];
+print "$akmon of $akcyc, $akyear.\n";

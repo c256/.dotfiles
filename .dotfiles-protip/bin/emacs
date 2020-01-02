@@ -1,0 +1,4 @@
+#!/bin/sh -
+
+cd /usr/local/src/emacs/emacs/nextstep
+exec ./Emacs.app/Contents/MacOS/Emacs "$@"

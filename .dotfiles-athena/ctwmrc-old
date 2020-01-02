@@ -1,0 +1,264 @@
+# Try out ctwm.  should be fun.
+
+MenuFont      	"-adobe-times-bold-i-normal--12-120-*-*-*-*-*-*"
+IconFont      	"-adobe-helvetica-bold-r-normal--12-120-*-*-*-*-*-*"
+IconManagerFont	"-schumacher-clean-bold-r-normal--10-*-*-*-*-*-*-*"
+ResizeFont    	"-b&h-lucidabright-medium-r-*-*-20-*-*-*-*-*-*-*"
+IconManagerFont "-adobe-helvetica-bold-r-normal--*-100-*-*-*"
+WorkSpaceFont   "-*-*-*-*-*-*-6-*-*-*-*-*-*-*"
+
+AutoRelativeResize
+# seems to DBT with zephyr
+#AutoFocusToTransients
+#ClientBorders { "Zwgc" "Ywgc" "Emacs" }
+BorderWidth 1
+#ClientBorderWidth
+CenterFeedbackWindow
+DontPaintRootWindow
+DontMoveOff
+IconifyByUnmapping
+InterpolateMenuColors
+IgnoreLockModifier
+RestartPreviousState
+#ShowWorkSpaceManager
+#StartInMapState
+MaxWindowSize "2000x2000"
+MoveDelta 3
+NoDefaults
+NoHighlight 
+# { 
+#   "xscreensaver" 
+#   "fclock" 
+#   "XLoad" 
+#   "XOsview" 
+#   "Virtual Desktop" 
+#   "XClock" 
+#   "XApm" 
+#  }
+NoGrabServer
+NoIconManagers
+NoMenuShadows
+NoRaiseOnMove
+NoRaiseOnResize
+NoShowOccupyAll
+NoTitle
+NoTitleHighlight
+MakeTitle { "Netscape" "Navigator" "Mozilla-bin" "Gimp" }
+OpaqueMove
+OpaqueResize
+PackNewWindows
+RandomPlacement "unmapped"
+StayUpMenus
+SqueezeTitle
+WarpUnmapped
+WindowRing { "NXTerm" "XTerm" "RightEmacs" "LeftEmacs"}
+WarpRingOnScreen
+#XMoveGrid 515
+#YMoveGrid 8
+XorValue 1
+Zoom 0
+
+ReallyMoveInWorkspaceManager
+
+WorkSpaceManagerGeometry        "300x30-3+3" 5
+WorkSpaces {
+    "Local"    {"Grey17"  "#99b0ff"}
+    "Web"      {"Grey17"  "#99b0ff"}
+    "Project"  {"Grey17"  "#99b0ff"}
+    "Quiet"    {"Grey17"  "#99b0ff"}
+    "Remote"   {"Grey17"  "#99b0ff"}
+}
+Occupy {
+	"XWrits"	{ "Local" "Web" "Project" "Remote" "Quiet"}
+	"XClock"	{ "Local" "Web" "Project" "Remote" }
+	"Zwgc"	        { "Local" "Remote" "Web" }
+	"Ywgc"	        { "Local" "Web" }
+	"MiniBuffer"	{ "Local" "Web" "Project" "Remote" }
+	"AkaBuffer"	{ "Local" "Web" "Project" "Remote" }
+	"XApm"		{ "Local" "Web" "Project" "Remote" }
+	"XLoad" 	{ "Local" "Web" "Project" "Remote" }
+	"leftosview"	{ "Local" "Web" "Project" "Remote" }
+	"rightosview"	{ "Local" "Web" "Project" "Remote" }
+	"xhextris"	{ "Quiet" }
+	"Netscape" 	{ "Web" }
+	"Mozilla" 	{ "Web" }
+	"Mozilla-bin" 	{ "Web" }
+}
+
+SaveColor {
+	"black"
+	"deep sky blue"
+	"steel blue"
+	"NavajoWhite"
+	"BlueViolet"
+	"SpringGreen"
+	"PaleGoldenRod"
+	"Orange"
+	"Light Steel Blue"
+        "LightSlateGray"
+        "SlateGray"
+        "MidnightBlue"
+}
+
+Color
+{
+  DefaultBackground 	    "black"
+  DefaultForeground 	    "deep sky blue"
+
+  BorderTileBackground      "SteelBlue" { "xscreensaver" "Black"
+	                                   "fclock" "Black"
+	                                   "Clock" "Black"
+                                           "XLoad" "Black"
+                                           "XOsview" "Black"
+                                           "XClock" "Black"
+                                           "XApm" "Black"
+                                           "TWM Icon Manager" "Black"
+                                           "Virtual Desktop" "Black"  }
+
+  BorderTileForeground      "SteelBlue" { "xscreensaver" "Black"
+	                                   "fclock" "Black"
+	                                   "Clock" "Black"
+                                           "XLoad" "Black"
+                                           "XOsview" "Black"
+                                           "XClock" "Black"
+                                           "XApm" "Black"
+                                           "TWM Icon Manager" "Black"
+                                           "Virtual Desktop" "Black"  }
+  BorderColor 		    "DeepSkyBlue"  { "xscreensaver" "Black"
+	                                   "fclock" "Black"
+	                                   "Clock" "Black"
+                                           "XLoad" "Black"
+                                           "XOsview" "Black"
+                                           "XClock" "Black"
+                                           "XApm" "Black"
+                                           "TWM Icon Manager" "Black"
+                                           "Virtual Desktop" "Black"  }
+
+  TitleBackground   	    "black"
+  TitleForeground   	    "NavajoWhite"
+  MenuBackground    	    "Black"
+  MenuForeground    	    "LightSteelBlue"
+  MenuTitleBackground       "Black"
+  MenuTitleForeground       "SteelBlue"
+  IconBackground    	    "SlateGray"
+  IconBorderColor   	    "MidnightBlue"
+  IconForeground    	    "DeepSkyBlue"
+  IconManagerBackground     "Black"
+  IconManagerForeground     "SteelBlue"
+  IconManagerHighlight      "DeepSkyBlue"
+}
+
+# do-everything in titles
+Function "move-or-raiselower" { f.forcemove f.deltastop f.raiselower }
+Function "resize-or-raiselower" { f.resize f.deltastop f.raiselower }
+
+# keybindings
+Button1 =	: root		: f.menu "WM"
+Button2 =       : root		: f.menu "TwmAllWindows"
+Button3 =       : root		: f.menu "#!"
+#Button3 = m5    : root          : f.menu "TwmAllWindows"
+Button1 = m5	: root	    	: f.menu "Master"
+Button2 = m5	: root	    	: f.menu "Master"
+Button3 = m5	: root	    	: f.menu "Master"
+
+Button1 = m5	: window	: f.function "resize-or-raiselower"
+Button2 = m5	: window	: f.raiselower
+Button3 = m5	: window	: f.forcemove
+
+Button1 =	: title		: f.function "move-or-raiselower"
+Button2 =	: title		: f.forcemove
+Button3 =	: title		: f.forcemove
+
+"Down"  = m5	: all		: f.lower
+"Up"    = m5	: all	        : f.raise
+"Left"  = m5	: all		: f.leftworkspace
+"Right" = m5	: all	        : f.rightworkspace
+"Left"  = 	: root		: f.leftworkspace
+"Right" = 	: root	        : f.rightworkspace
+
+#"Up"    = c|s|m : all		: f.forcermoveto "0 -1"
+#"Down"  = c|s|m : all		: f.forcermoveto "0  1"
+#"Left"  = c|s|m : all		: f.forcermoveto "-1 0"
+#"Right" = c|s|m : all           : f.forcermoveto "1 0"
+
+# Function Keys
+"F1"    =         : all             : f.warpring "next"
+"F5"    =         : all             : f.warpring "next"
+"F5"    = m5      : all             : f.warpring "next"
+"F4"    = m       : w               : f.delete
+"F4"    = m5      : w               : f.delete
+"F12"   = c|m5    : all             : f.restart
+
+"F1"    = c|m5    : all             : f.menu "WM"
+"F2"    = c|m5    : all             : f.menu "TwmAllWindows"
+"F3"    = c|m5    : all             : f.menu "#!"
+
+# windowmanager keyboard mode
+"Return" = m5     : all   	    : f.altkeymap "1"
+"Left"   = a1     : all	            : f.leftworkspace
+"Right"  = a1     : all	            : f.rightworkspace
+"Up"     = a1     : window          : f.raise
+"Down"   = a1     : window          : f.lower
+"a"      = a1     : window          : f.occupyall
+"o"      = a1     : window          : f.occupy
+"d"      = a1     : window          : f.vanish
+"w"      = a1     : window          : f.refresh
+"n"      = a1     : window          : f.warpring "next"
+"p"      = a1     : window          : f.warpring "prev"
+"1"      = a1     : all             : f.menu "WM"
+"2"      = a1     : all             : f.menu "TwmWindows"
+"3"      = a1     : all             : f.menu "#!"
+"q"      = a1     : all             : f.beep
+
+
+# Menus
+
+menu "Master"
+{
+"*Master"	f.title
+"Up"		f.raise
+"Focus"		f.focus
+"WM"		f.menu "WM"
+"#!"		f.menu "#!"
+"ThisW" 	f.menu "TwmWindows"
+"AllW"    	f.menu "TwmAllWindows"
+"Quit"		f.menu "ConfirmQuit"
+}
+
+menu "ConfirmQuit"
+{
+"Confirm"	("red":"white")		f.title
+"" 		("white":"white")	!"echo You missed"
+"Exit WM"	("red":"white") 	f.quit
+}
+
+menu "WM"
+{
+"*WM"		f.title
+"Icon"		f.iconify
+"Size"		f.resize
+"Move"		f.forcemove
+"Down"		f.lower
+"Wipe"		f.refresh
+"Id"		f.identify
+"Add"		f.occupy
+".rc"		f.restart
+"Del"		f.delete
+"Kill"		f.destroy
+}
+
+menu "#!"
+{
+"*#!"		f.title
+"emacs"		!"emacs -name RightEmacs &"
+"left"		!"xterm -name LeftTerm &"
+"right"		!"xterm -name RightTerm &"
+"web"	        !"netscape &"
+"clock"		!"xclock &"
+"meter"		!"xmeter &"
+"mag"		!"xmag &"
+"black"         !"xsetroot -solid black"
+"matrix"        !"xmatrix -root &"
+"xrdb"		!"xrdb -load ~/.Xresources &"
+"lock"		!"ssh-add -D; xscreensaver-command -lock &"
+}

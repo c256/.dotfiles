@@ -1,0 +1,39 @@
+#!/usr/bin/perl -w
+
+# hack to use web<->zephyr gw
+# could use some formatting help.  ok, a lot.
+
+$req = "http://stuff.mit.edu/cgi/zlocate?";
+$anyone = $ENV{HOME} . "/.anyone";
+
+open(ANYONE, "<$anyone") or die "Couldn't open $anyone.";
+
+
+while (<ANYONE>) {
+    chomp;
+    $req = "$req$_+";
+}
+
+$command = "curl -s -A \"ChadZlocate 0.1\" $req";
+#$command = "links -source $req";
+#print $command . "\n";
+
+$response = `$command`;
+$response =~ s/:\n/: /g;
+$response =~ s/\t/ /g; # reduce whitespace
+#$response =~ s/   / /g; # reduce whitespace
+$response =~ s/\n.*: Hidden or not logged-in\n//g; # remove misses
+$response =~ s/<pre>//g;
+$response =~ s/<a href.*\">//g;
+$response =~ s/<\/a>//g;
+$response =~ s/\@ATHENA\.MIT\.EDU//g;
+
+@response = split("\n", $response);
+
+my $len = @response-2;
+my $i = 4;
+while ($i < $len) {
+    print "$response[$i]\n";
+    $i++;
+}
+

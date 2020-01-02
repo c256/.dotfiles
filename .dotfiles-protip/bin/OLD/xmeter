@@ -1,0 +1,4 @@
+#!/bin/sh
+
+xosview -name leftosview &
+exec xosview -name rightosview

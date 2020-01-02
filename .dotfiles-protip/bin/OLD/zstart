@@ -1,0 +1,16 @@
+#!/bin/sh
+
+if [ "$1" = "" ] ; then
+  SUBFILE=$HOME/.Private/noise.zsubs
+else
+  SUBFILE="$1"
+fi
+
+zwgc -subfile $SUBFILE
+
+if [ $? = 0 ] ; then
+  get_message -new -zephyr
+  znol on | zwrite -q -n -c sendme -i yandros yandros
+fi
+
+

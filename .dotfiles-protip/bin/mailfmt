@@ -1,0 +1,10 @@
+#!/bin/sh
+
+pbpaste| fmt | pbcopy
+if [ $? -ne 0 ] ; then
+	echo "$0: failed!"
+	say "$0 failed!"
+	exit 17
+fi
+
+say "Formatted text ready for pasting."

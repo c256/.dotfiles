@@ -1,0 +1,5 @@
+#!/bin/sh
+
+cd $HOME/.Private/mh-mail
+
+glimpseindex -H $HOME/.Private/mh-mail -B -f -M 8 -b -t -w 1100 -z $HOME/.Private/mh-mail

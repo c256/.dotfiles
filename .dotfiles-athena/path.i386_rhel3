@@ -1,0 +1,28 @@
+# beware
+#
+# Chad Brown
+# yandros@ATHENA.MIT.EDU
+#
+
+if (! $?hosttype) set hosttype = `/bin/athena/machtype`
+if (! $?bindir) set bindir = `/bin/athena/machtype`bin
+if (! $?athena_path ) then
+  set athena_path=( /srvd/patch /usr/athena/bin /bin/athena /usr/bin/X11 \
+                    /usr/new /usr/ucb /bin /usr/bin /usr/ibm \
+      	      	    /usr/andrew/bin /usr/afs/bin )
+endif
+
+set path = ( ~/bin /mit/sipb/bin /mit/outland/bin \
+	     /mit/emacs/beta/bin /mit/emacs/bin \
+             /mit/infoagents/bin /mit/mime/bin \
+             /afs/net/tools/@sys /usr/local/bin /mit/java/bin \
+             /etc/athena /usr/athena/etc /etc /usr/etc \
+             $athena_path /afs/athena/system/afsuser/arch/@sys/bin )
+
+
+setenv MANPATH ~/man:/mit/sipb/man:/mit/outland/man:/mit/watchmaker/man:/usr/athena/man:/usr/man
+
+setenv XFILESEARCHPATH ./%N:$HOME/lib/X11/%T/%N:/mit/sipb/lib/%T/%N:/mit/x11/${HOSTTYPE}lib/X11/%T/%N:/usr/athena/lib/X11/%T/%N:/usr/lib/X11/%T/%N
+
+setenv PERLLIB $HOME/lib/perl:/afs/athena.mit.edu/contrib/perl/lib:/usr/athena/lib/perl
+

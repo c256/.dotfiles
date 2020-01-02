@@ -1,0 +1,35 @@
+#!/bin/sh
+
+YUPLOG=/usr/local/src/.yupdate-protip.log
+THIS=`basename $0`
+
+date > $YUPLOG
+# update homebrew package list, and homebrew itself
+echo "Homebrew" | tee -a $YUPLOG
+brew update | tee -a $YUPLOG
+brew upgrade | tee -a $YUPLOG
+if [ $? -ne 0 ] ; then
+	echo "$THIS: brew failed!"
+	say "Brew update failed!"
+	exit "17"
+fi
+
+# refresh projects
+for prj in `cat /usr/local/src/.git-get-list`
+do 
+	cd $prj
+	/bin/echo ---------------------------------- | tee -a $YUPLOG
+	/bin/echo -n `basename $PWD`": " | tee -a $YUPLOG
+	git pull --rebase | tee -a $YUPLOG
+	git submodule sync | tee -a $YUPLOG
+	git submodule update | tee -a $YUPLOG
+done
+if [ $? -ne 0 ]; then
+	echo "$THIS: Git pull failed!"  | tee -a $YUPLOG
+	say "Git pull failed!" | tee -a $YUPLOG
+	exit 18
+fi
+
+speak "Update complete"
+echo "$THIS: complete" | tee -a $YUPLOG
+

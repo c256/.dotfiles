@@ -1,0 +1,25 @@
+#!/bin/sh
+#
+# using macosx facilities, say the arguments in Vicki's voice.
+# If called with the volume muted, temporarily unmute.
+#
+# -- If the volume was turned all the way down, you probably still
+# -- can't hear anything. At some point, consider temporarily raising
+# -- it to a reasonable default value.
+#
+# macOS 10.12 Sierra loses voice "Vicki", has "Victoria" instead.
+# macOS 10.13 High Sierra re-adds some classic fun voices.
+
+if test `osascript -e "get output muted of (get volume settings)"` = true; then
+	was_muted=yes
+	osascript -e "set volume output muted false"
+else
+	was_muted=no
+fi
+
+say -v Zarvox "$@"
+
+if test $was_muted = yes; then
+	osascript -e "set volume output muted true"
+fi
+

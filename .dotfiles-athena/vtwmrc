@@ -1,0 +1,388 @@
+# My windowmanager description file : yandros@mit.edu
+
+MenuFont      	"-adobe-times-bold-i-normal--12-120-*-*-*-*-*-*"
+IconFont      	"-adobe-helvetica-bold-r-normal--12-120-*-*-*-*-*-*"
+DoorFont      	"10x20"
+ResizeFont    	"10x20"
+
+AutoRelativeResize
+BorderWidth 1
+ButtonIndent 0
+CenteredResizeBox
+#ClientBorders { "zwgc"}
+#ClientBorderWidth
+DontMoveOff
+FramePadding 1
+IconDirectory "/mit/yandros/graphics"  
+IconRegion "+0-0" South East 1 1
+IconifyByUnmapping 
+InterpolateMenuColors
+MoveDelta 1
+NoCaseSensitive
+NoDefaults
+NoGrabServer
+NoHighlight { "xscreensaver" "fclock" "XLoad" "Virtual Desktop" }
+NoIconManagers
+NoMenuShadows
+NoSaveUnders
+NoTitle
+MakeTitle { "Netscape" "Navigator" "Gimp" }
+OpaqueMove
+PanDistanceX    100
+PanDistanceY    100
+RestartPreviousState
+SnapRealScreen
+VirtualDesktop "100x31+7-5" 40
+WarpUnmapped
+WindowRing { "Silmaril" "Emacs" "Orb" }
+XorValue 3
+Zoom 0
+
+NailedDown 
+{
+  "Virtual Desktop"
+  "DClock"
+  "oclock"
+  "xload"
+  "zwgc"
+  "XCal"
+  "XScreensaver"
+  "Twm Door"
+  "Dash"
+  "Console"
+  "MiniBuffer"
+  "Gaintool"
+  "WorkMan"
+  "XMcd"
+}
+
+DontShowInDisplay 
+{
+  "Virtual Desktop"
+  "DClock"
+  "oclock"
+  "xload"
+  "zwgc"
+  "XCal"
+  "fclock"
+  "XScreensaver"
+  "Twm Door"
+  "Gaintool"
+  "WorkMan"
+  "MiniBuffer"
+  "XMcd"
+}
+
+Cursors
+{
+  Frame 	"fleur"
+  Title         "sword.cursor.xbm" "sword.mask.xbm"
+  Icon      	"sword.cursor.xbm" "sword.mask.xbm"
+  IconMgr   	"pencil"
+  Move      	"fleur"
+  Resize        "iron_cross"
+  Menu      	"sb_left_arrow"
+  Wait      	"watch"
+  Select        "swirl.cursor.xbm" "swirl.mask.xbm"
+  Destroy   	"pirate"
+}
+
+
+Monochrome
+{
+  DefaultBackground 	    "black"
+  DefaultForeground 	    "white"
+  TitleBackground  	    "black"
+  TitleForeground  	    "white"
+  IconBackground   	    "black"
+  IconForeground   	    "white"
+  IconBorderColor  	    "white"
+  MenuBackground      	    "black"
+  MenuForeground  	    "white"
+  MenuTitleBackground 	    "black"
+  MenuTitleForeground 	    "white"
+  BorderTileBackground 	    "black"
+  BorderTileForeground 	    "white"
+  {
+#    "XCal"		    "black"
+#    "Twm Door"		    "black"
+#    "DClock"  	      	    "black"
+    "xclock"  	      	    "black"
+    "Black"                 "black"
+  } 
+  BorderColor 		    "white"
+  {
+#    "XCal"		    "black"
+#    "DClock"  	      	    "black"
+    "xclock"  	      	    "black"
+    "Black"                 "black"
+  } 
+  DesktopDisplayBackground  "black"
+  DesktopDisplayBorder      "white"
+  DoorBackground 	    "black"
+  DoorForeground 	    "White"
+}
+
+
+Grayscale
+{
+  DefaultBackground 	    "black"
+  DefaultForeground 	    "white"
+  TitleBackground  	    "black"
+  TitleForeground  	    "white"
+  IconBackground   	    "black"
+  IconForeground   	    "white"
+  IconBorderColor  	    "white"
+  MenuBackground      	    "black"
+  MenuForeground  	    "white"
+  MenuTitleBackground 	    "black"
+  MenuTitleForeground 	    "white"
+  BorderTileBackground 	    "black"
+  BorderTileForeground 	    "white"
+  {
+    "XCal"		    "black"
+    "Twm Door"		    "white"
+    "DClock"  	      	    "black"
+    "xclock"  	      	    "black"
+    "Black"                 "black"
+  } 
+  BorderColor 		    "white"
+  {
+    "XCal"		    "black"
+    "DClock"  	      	    "black"
+    "xclock"  	      	    "black"
+    "Black"                 "black"
+  } 
+  DesktopDisplayBackground  "black"
+  DesktopDisplayBorder      "gray85"
+  DoorBackground 	    "gray20"
+  DoorForeground 	    "gray85"
+}
+
+
+Color
+{
+  DefaultBackground 	    "black"
+  DefaultForeground 	    "deep sky blue"
+
+  BorderTileBackground      "SteelBlue" { "xscreensaver" "Black"
+	                                   "fclock" "Black"
+                                           "XLoad" "Black"
+                                           "Virtual Desktop" "Black"  }
+
+  BorderTileForeground      "SteelBlue" { "xscreensaver" "Black"
+	                                   "fclock" "Black"
+                                           "XLoad" "Black"
+                                           "Virtual Desktop" "Black"  }
+  BorderColor 		    "DeepSkyBlue"  { "xscreensaver" "Black"
+	                                   "fclock" "Black"
+                                           "XLoad" "Black"
+                                           "Virtual Desktop" "Black"  }
+
+  TitleBackground   	    "black"
+  TitleForeground   	    "NavajoWhite"
+  MenuBackground    	    "light steel blue"
+  MenuForeground    	    "midnight blue"
+#  MenuBackground    	    "black"
+#  MenuForeground    	    "LightSteelBlue"
+  MenuTitleBackground       "White"
+  MenuTitleForeground       "blue violet"
+  IconBackground    	    "SlateGray"
+  IconBorderColor   	    "MidnightBlue"
+  IconForeground    	    "DeepSkyBlue"
+  DesktopDisplayBackground  "black"
+  DesktopDisplayBorder 	    "SteelBlue"
+  DoorBackground      	    "black"
+  DoorForeground      	    "hotpink"
+}
+
+
+Function "my-move-or-raiselower"    { f.forcemove f.deltastop f.raiselower }
+Function "my-quit" 		    { f.warpto "XTerm" f.quit }
+Function "my-nail" 		    { f.nail f.nop }
+Function "my-newdoor" 		    { f.newdoor f.nop }
+Function "my-showdesktopdisplay"    { f.warpto "Virtual Desktop" f.nop }
+Function "my-hidedesktopdisplay"    { f.hidedesktopdisplay f.nop }
+Function "my-nail-and-panright"     { f.nail f.panright "100" f.nail }
+Function "my-nail-and-panleft"      { f.nail f.panleft "100" f.nail }
+Function "my-del-zwgc"		    { f.savestate f.warpto "zwgc" f.delete f.restorestate }
+
+"F1"    =         : all             : f.warpring "next"
+"F12"   =         : all             : f.warpring "next"
+"F7"   = c|m|s	  : all		    : f.restart
+"F7"   = c|mod5|s: all		    : f.restart
+
+#"Up"    = m       : all             : f.raise
+#"Down"  = m       : all  	    : f.lower
+"Down"  = mod5	  : all		    : f.lower
+"Up"    = mod5	  : all		    : f.raise
+
+Button1 = 	  : root	    : f.menu "WM"
+Button2 = 	  : root	    : f.menu "TwmWindows"
+Button3 = 	  : root	    : f.menu "Stuff"
+Button1 = m	  : w|v		    : f.raiselower
+Button1 = m       : iconmgr	    : f.hideiconmgr
+Button2 = m	  : w|i|v|iconmgr   : f.resize
+Button3 = m	  : w|i|v|iconmgr   : f.forcemove
+Button1 = mod5	  : w|v		    : f.raiselower
+Button1 = mod5    : iconmgr	    : f.hideiconmgr
+Button2 = mod5	  : w|i|v|iconmgr   : f.resize
+Button3 = mod5	  : w|i|v|iconmgr   : f.forcemove
+Button1 =	  : f|t	 	    : f.function "my-move-or-raiselower"
+Button2 =	  : f|t		    : f.resize
+Button3 =	  : f|t 	    : f.function "my-move-or-raiselower"
+Button1 =	  : icon	    : f.iconify
+Button2 =	  : icon	    : f.iconify
+Button3 =	  : icon	    : f.iconify
+Button1 =	  : iconmgr	    : f.iconify
+Button2 = 	  : iconmgr	    : f.warpto ""
+Button3 = 	  : iconmgr	    : f.function "my-nail"
+Button1 = m	  : root	    : f.menu "MasterMenu"
+Button3 = m	  : root	    : f.menu "ControlMenu"
+Button1 = mod5	  : root	    : f.menu "MasterMenu"
+Button3 = mod5	  : root	    : f.menu "ControlMenu"
+
+#"Left"  = m       : all      	    : f.panleft "100"
+#"Right" = m       : all      	    : f.panright "100"
+"Left"  = mod5    : all      	    : f.panleft "100"
+"Right" = mod5	  : all      	    : f.panright "100"
+"Left"  =         : virtual|root    : f.panleft "100"
+"Right" =         : virtual|root    : f.panright "100"
+"Left"  = s | m   : all		    : f.function "my-nail-and-panleft"
+"Right" = s | m   : all		    : f.function "my-nail-and-panright"
+"Up"    = c | m   : all		    : f.forcermoveto "0 -1"
+"Down"  = c | m   : all		    : f.forcermoveto "0  1"
+"Left"  = c | m   : all		    : f.forcermoveto "-1 0"
+"Right" = c | m   : all		    : f.forcermoveto "1 0"
+"Left"  = s|mod5  : all		    : f.function "my-nail-and-panleft"
+"Right" = s|mod5  : all		    : f.function "my-nail-and-panright"
+"Up"    = c|mod5  : all		    : f.forcermoveto "0 -1"
+"Down"  = c|mod5  : all		    : f.forcermoveto "0  1"
+"Left"  = c|mod5  : all		    : f.forcermoveto "-1 0"
+"Right" = c|mod5  : all		    : f.forcermoveto "1 0"
+"F5"    = mod5	  : all		    : f.function "my-del-zwgc"
+"F5"    = m	  : all		    : f.function "my-del-zwgc"
+"F5"    = 	  : all		    : f.function "my-del-zwgc"
+"F4"    = m       : w               : f.delete
+"F4"    = mod5    : w               : f.delete
+
+Button1 = 	  : v|desktop	    : f.movescreen
+Button2 =     : v|desktop     : f.panleft  "100"
+Button3 =     : v|desktop     : f.panright "100"
+Button1 =  m      : desktop         : f.raiselower
+Button2 =  m      : desktop         : f.warpto ""
+Button3 =  m      : desktop         : f.nail
+Button1 =         : door            : f.enterdoor
+Button2 =         : door            : f.enterdoor
+Button3 =         : door            : f.enterdoor
+Button1 = m	  : w|v|door	    : f.raiselower
+Button1 = m       : iconmgr	    : f.hideiconmgr
+Button2 = m	  : w|i|v|door	    : f.resize
+Button3 = m	  : w|i|v|door	    : f.forcemove
+Button1 = mod5	  : w|v|door	    : f.raiselower
+Button1 = mod5	  : iconmgr	    : f.hideiconmgr
+Button2 = mod5	  : w|i|v|door	    : f.resize
+Button3 = mod5	  : w|i|v|door	    : f.forcemove
+
+
+
+menu "MasterMenu"
+{
+"Master"	f.title
+"WM"		f.menu "WM"
+"Stuff"		f.menu "Stuff"
+"Windows" 	f.menu "TwmWindows"
+"Control"	f.menu "ControlMenu"
+}
+
+menu "ControlMenu"
+{
+"Control"	f.title
+"Raise"		f.raise
+"Lower"	 	f.lower
+"Focus"		f.focus
+"Door"		f.function "my-newdoor"
+"Zoom"		f.menu "Zoom"
+"IconMgr"	f.menu "IconMgr"
+"Desktop"	f.menu "Desktop"
+"Quit"		f.menu "confirmquit"
+"Logout"	f.menu "confirmlogout"
+}
+
+menu "Zoom"
+{
+"Full"		f.fullzoom
+"Top"		f.topzoom
+"Bottom"	f.bottomzoom
+"Left"		f.leftzoom
+"Right"		f.rightzoom
+"Wide"		f.hzoom
+"Tall"		f.zoom
+}
+
+menu "IconMgr"
+{
+"Show"		f.showiconmgr
+"Hide"		f.hideiconmgr
+}
+
+menu "Desktop"
+{
+"Show"		f.showdesktopdisplay
+"Hide"		f.hidedesktopdisplay
+}
+
+menu "confirmquit"
+{
+"Confirm"	("red":"white")		f.title
+"" 		("white":"white")	!"echo You missed"
+"Exit Vtwm"	("red":"white") 	f.function "my-quit"
+}
+
+menu"confirmlogout"
+{
+"Confirm"	("red":"white")		f.title
+""		("white":"white")	!"echo You missed"
+"Logout"	("red":"white")		!"end_session;kill $XSESSION;kill -1 -1;kdestroy;unlog"
+}
+
+menu "WM"
+{
+"WM"		f.title
+"Icon"		f.iconify
+"Size"		f.resize
+"Move"		f.forcemove
+"Down"		f.lower
+"Wipe"		f.refresh
+"Id"		f.identify
+"Nail"		f.function "my-nail"
+".rc"		f.restart
+"Del"		f.delete
+"Kill"		f.destroy
+}
+
+menu "Vtwm"
+{
+"Nail"		f.menu "NailMenu"
+"Door"		f.menu "DoorMenu"
+"IconMgr"	f.menu "IconMgrMenu"
+"Desktop"	f.menu "DesktopMenu"
+}
+
+
+menu "Stuff"
+{
+"Stuff"		f.title
+"Palantiri"	!"emacs -name Palantiri &"
+"Silmaril"	!"xterm -name Silmaril &"
+"Netscape"     !"netscape-beta &"
+"Console"	!"show_console&"
+"Fclock"	!"fclock &"
+"Black"		!"xsetroot -solid black"
+"Xload"		!"xload &"
+"XMag"		!"xmag &"
+"Xrdb"		!"xrdb $HOME/.resources &"
+"XSS"		!"xscreensaver &"
+"Orb"		!"xterm -name Orb &"
+}
+

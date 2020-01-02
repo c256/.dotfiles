@@ -1,0 +1,3 @@
+#!/bin/sh 
+
+find . -type f -a \( -name '.*~' -o -name '*~' -o -name '.#*' -o -name 'core' -o -name 'core.[0-9][0-9][0-9]*' -o -name ',*' \) -ok rm {} \;

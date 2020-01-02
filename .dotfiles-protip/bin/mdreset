@@ -1,0 +1,8 @@
+#!/bin/sh
+
+echo "Erase index."
+sudo mdutil -Ea
+echo "Turn off indexing."
+sudo mdutil -ai off
+echo "Turn on indexing."
+sudo mdutil -ai on
