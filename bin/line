@@ -1,0 +1,6 @@
+#!/bin/sh
+
+lno="${1}"
+shift
+
+sed -n "$lno p" "$@"

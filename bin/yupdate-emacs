@@ -1,0 +1,28 @@
+#!/bin/sh 
+
+EMACSDIR=/usr/local/src/emacs
+YULOG=$EMACSDIR/../.yupdate-emacs.log
+
+cd $EMACSDIR
+
+date > $YULOG
+
+git pull --rebase | tee -a $YULOG
+if [ $? -ne 0 ]; then
+	echo "Git pull failed!"
+	exit 17
+fi
+./autogen.sh | tee -a $YULOG
+./configure --prefix-/usr/local --with-gnutls --without-pop | tee -a $YULOG
+if [ $? -ne 0 ]; then
+	echo "Configure failed!"
+	echo "Emacs Configure failed!"
+	exit 19
+fi
+
+make -j6 bootstrap | tee -a $YULOG
+if [ $? -ne 0 ]; then
+	echo "Build failed!"
+else
+	echo "Update complete; NOT installed."
+fi

@@ -1,0 +1,4 @@
+#!/bin/sh
+
+GET http://myexternalip.com/raw
+echo

@@ -1,0 +1,6 @@
+#!/bin/sh
+
+emacsclient -e '(kill-emacs)'
+sleep 9 
+ps waux | grep -i emacs
+

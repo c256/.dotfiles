@@ -1,0 +1,3 @@
+#!/bin/sh -x
+
+find . \( -name '.*~' -o -name '*~' -o -name '#*' -o -name '.#*' -o -name '*core' -o -name ',*' \) -ok rm {} \;

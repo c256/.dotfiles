@@ -1,0 +1,26 @@
+#!/usr/bin/perl  -w
+
+  chomp($string = <STDIN>);
+  $asBinary = asc2bin($string);
+  $asASCII  = bin2asc($asBinary);
+
+  sub asc2bin {
+    my ($str) = @_;
+    my @bytes;
+    for (split //, $string) {
+      vec(my($byte), 0, 8) = ord;
+      push @bytes, unpack "B8", $byte;
+    }
+    return wantarray ? @bytes : join " ", @bytes;
+  }
+
+
+  sub bin2asc {
+    @_ = split ' ', $_[0] if @_ == 1;
+    my @chars;
+    for (@_) {
+      my $asc = unpack "C", pack "B8", $_;
+      push @chars, chr($asc);
+    }
+    return wantarray ? @chars : join "", @chars;
+  }

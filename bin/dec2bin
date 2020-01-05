@@ -1,0 +1,16 @@
+#!/usr/bin/perl -w
+#
+# stolen from the cookbook, pg. 48
+
+foreach (@ARGV) {
+    print "$_: " . dec2bin($_) . "\n";
+}
+
+sub dec2bin {
+    my $str = unpack("B32", pack("N", shift));
+    $str =~ s/^0+(?=\d)//; # trim leading 0's
+    return $str;
+}
+
+
+
