@@ -3,7 +3,6 @@
 
 (setq debug-on-error 't) ; testing
 
-;;(setq solarized-high-contrast-mode-line t)
 (package-initialize) ;; waiting to see how this falls out
 
 ;; Generic settings
@@ -43,26 +42,27 @@
   (`ns  (require 'y-mac))
   (`x   (require 'y-x11))
   (_    (message "No window system selected.")))
-(require 'y-keybindings) ;; last, so everything is properly defined
+(require 'y-keybindings) ;; late, so everything is properly defined
 
 ;; package manager support
 (add-to-list 'package-archives
              '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 
 ;; Look into replacing these with use-package directives.
-;(disable-quiet 'tool-bar-mode)
-; (disable-quiet 'scroll-bar-mode)
 (disable-quiet 'blink-cursor-mode)
-;(pcase (window-system)
-;  (`mac (enable-quiet 'menu-bar-mode)) ; since it's displayed by the OS
-;  (`ns  (enable-quiet 'menu-bar-mode)) ; ...in both of these...
-;  (_    (disable-quiet 'menu-bar-mode)))
-;(enable-quiet 'transient-mark-mode)
+;; Moved all these into early-init
+;;(pcase (window-system)
+;;  (`mac (enable-quiet 'menu-bar-mode)) ; since it's displayed by the OS
+;;  (`ns  (enable-quiet 'menu-bar-mode)) ; ...in both of these...
+;;  (_    (disable-quiet 'menu-bar-mode)))
+;;(disable-quiet 'tool-bar-mode)
+;; (disable-quiet 'scroll-bar-mode)
+;;(enable-quiet 'transient-mark-mode) ; default now
 (enable-quiet 'show-paren-mode)
 (enable-quiet 'temp-buffer-resize-mode)
 (enable-quiet 'resize-minibuffer-mode)
 (enable-quiet 'line-number-mode)
-(disable-quiet 'column-number-mode) ; don't want it on normally
+(disable-quiet 'column-number-mode)
 (enable-quiet 'auto-image-file-mode)
 (enable-quiet 'global-font-lock-mode)
 (enable-quiet 'minibuffer-electric-default-mode)
@@ -73,9 +73,10 @@
 (enable-quiet 'savehist-mode)
 (enable-quiet 'recentf-mode)
 (enable-quiet 'which-function-mode)
-(enable-quiet 'icomplete-mode) ; incremental completion in the minibuffer
-;(enable-quiet 'ido-mode) ; more complex completion mode
-;(enable-quiet 'ido-everywhere)
+;;(enable-quiet 'icomplete-mode) ; incremental completion in the minibuffer
+(enable-quiet 'fido-mode)
+;;(enable-quiet 'ido-mode) ; more complex completion mode
+;;(enable-quiet 'ido-everywhere)
 
 ;;(use-package google-this
 ;;  :config
@@ -89,9 +90,8 @@
   :ensure t
   :config
   (setq dashboard-startup-banner 'logo)
-  (dashboard-setup-startup-hook))
-;; including in emacsclient -c
-(setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
+  (dashboard-setup-startup-hook)
+  (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*"))))
 
 ;; emacs `Customize' configuration support, done here to control
 ;; config loading order.

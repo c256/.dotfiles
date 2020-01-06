@@ -8,6 +8,8 @@ alias bd='popd'
 alias clean='rm -i ./.*~ ./*~'
 alias dq='df -k ~'
 alias where='which'
+alias cp='cp -i'
+alias mv='mv -i'
 
 alias dotfiles='git --git-dir=$HOME/.dotfiles --work-tree=$HOME'
 alias df-clone='git clone --separate-git-dir=$HOME/.dotfiles https://github.com/c256/.dotfiles.git $HOME'
